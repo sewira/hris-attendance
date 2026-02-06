@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
+
   var obscurePassword = true.obs;
   void togglePassword() {
     obscurePassword.value = !obscurePassword.value;
@@ -10,11 +11,10 @@ class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final isFilled = false.obs;
-
+  
   @override
   void onInit() {
     super.onInit();
-
     emailController.addListener(_checkFilled);
     passwordController.addListener(_checkFilled);
   }

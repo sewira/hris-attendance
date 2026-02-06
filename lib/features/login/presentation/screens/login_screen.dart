@@ -27,9 +27,7 @@ class LoginScreen extends StatelessWidget {
         backgroundColor: AppColor.netral1,
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: width < 360 ? 24 : 50,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: width < 360 ? 24 : 50),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -102,9 +100,13 @@ Widget _textForm(BuildContext context, LoginController controller) {
       const SizedBox(height: 30),
       SizedBox(
         width: width * 0.7,
-        child: TextFieldPassword(
-          hint: "Password",
-          controller: controller.passwordController,
+        child: Obx(
+          () => TextFieldPassword(
+            hint: "Password",
+            controller: controller.passwordController,
+            obscureText: controller.obscurePassword.value,
+            onToggle: controller.togglePassword,
+          ),
         ),
       ),
     ],
@@ -116,10 +118,7 @@ Widget _buttonLogin(LoginController controller) {
     return ButtonLogin(
       label: "Login",
       isEnabled: controller.isFilled.value,
-      onPressed: () {}, 
+      onPressed: () {},
     );
   });
 }
-
-
-
