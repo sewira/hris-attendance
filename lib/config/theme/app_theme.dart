@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hr_attendance/config/theme/app_color.dart';
 
 abstract class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.blue,
+        seedColor: AppColor.info,
         brightness: Brightness.light,
       ),
       appBarTheme: const AppBarTheme(
@@ -27,7 +28,7 @@ abstract class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.blue,
+        seedColor: AppColor.info,
         brightness: Brightness.dark,
       ),
       appBarTheme: const AppBarTheme(

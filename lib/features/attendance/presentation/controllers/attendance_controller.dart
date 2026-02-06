@@ -23,7 +23,6 @@ class AttendanceController extends GetxController {
   RxString errorMessage = ''.obs;
   RxString currentTime = ''.obs;
 
-  // TODO: Replace with actual employee ID from auth
   final String employeeId = 'employee_001';
 
   @override
