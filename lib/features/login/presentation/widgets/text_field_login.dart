@@ -16,7 +16,7 @@ class TextFieldLogin extends StatelessWidget {
           controller: controller,
           style: const TextStyle(
             fontFamily: "Inter",
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: FontWeight.w500,
             color: AppColor.disableBorder,
           ),
@@ -25,7 +25,7 @@ class TextFieldLogin extends StatelessWidget {
             hintText: hint,
             hintStyle: TextStyle(
               fontFamily: "Inter",
-              fontSize: 18,
+              fontSize: 20,
               color: AppColor.disableBorder,
               fontWeight: FontWeight.w500,
             ),
@@ -64,11 +64,12 @@ class TextFieldPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      
       controller: controller,
       obscureText: obscureText,
       style: const TextStyle(
         fontFamily: "Inter",
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: FontWeight.w500,
         color: AppColor.disableBorder,
       ),
@@ -76,7 +77,7 @@ class TextFieldPassword extends StatelessWidget {
         hintText: hint,
         hintStyle: const TextStyle(
           fontFamily: "Inter",
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: FontWeight.w500,
           color: AppColor.disableBorder,
         ),
@@ -86,10 +87,7 @@ class TextFieldPassword extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(
-            color: AppColor.disableBorder,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppColor.disableBorder, width: 2),
         ),
         suffixIcon: IconButton(
           icon: HeroIcon(
@@ -99,6 +97,41 @@ class TextFieldPassword extends StatelessWidget {
           ),
           onPressed: onToggle,
         ),
+      ),
+    );
+  }
+}
+
+class ErrorMassage extends StatelessWidget {
+  final String errorMassage;
+
+  const ErrorMassage({super.key, required this.errorMassage});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 35,
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColor.dangerPressed.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              errorMassage,
+              style: const TextStyle(
+                fontFamily: "Inter",
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColor.dangerPressed,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -18,6 +18,17 @@ class App extends StatelessWidget {
       initialBinding: GlobalBinding(),
       initialRoute: AppRoutes.login,
       getPages: appPages,
+
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: const TextScaler.linear(1.0),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

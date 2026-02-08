@@ -4,8 +4,9 @@ import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/features/login/presentation/controllers/login_controller.dart';
-import 'package:hr_attendance/features/login/presentation/widgets/button_login.dart';
 import 'package:hr_attendance/features/login/presentation/widgets/text_field_login.dart';
+import 'package:hr_attendance/shared/widgets/molecules/button_widget.dart';
+import 'package:hr_attendance/features/login/presentation/widgets/error_builder.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -25,22 +26,31 @@ class LoginScreen extends StatelessWidget {
       ),
       child: Scaffold(
         backgroundColor: AppColor.netral1,
+        resizeToAvoidBottomInset: true,
         body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: width < 360 ? 24 : 50),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: height * 0.14),
-                  _logo(),
-                  const SizedBox(height: 20),
-                  _title(),
-                  SizedBox(height: height * 0.08),
-                  _textForm(context, controller),
-                  const SizedBox(height: 30),
-                  _buttonLogin(controller),
-                ],
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: width < 360 ? 24 : 50,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: height * 0.13),
+                    _logo(),
+                    const SizedBox(height: 20),
+                    _title(),
+                    SizedBox(height: height * 0.065),
+                    _textForm(context, controller),
+                    const SizedBox(height: 30),
+                    _buttonLogin(controller),
+                  ],
+                ),
               ),
             ),
           ),
@@ -101,11 +111,24 @@ Widget _textForm(BuildContext context, LoginController controller) {
       SizedBox(
         width: width * 0.7,
         child: Obx(
-          () => TextFieldPassword(
-            hint: "Password",
-            controller: controller.passwordController,
-            obscureText: controller.obscurePassword.value,
-            onToggle: controller.togglePassword,
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFieldPassword(
+                hint: "Password",
+                controller: controller.passwordController,
+                obscureText: controller.obscurePassword.value,
+                onToggle: controller.togglePassword,
+              ),
+
+              ErrorBuilder(
+                message: controller.passwordError.value,
+                child: ErrorMassage(
+                  errorMassage:
+                      controller.passwordError.value ?? "",
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -113,12 +136,14 @@ Widget _textForm(BuildContext context, LoginController controller) {
   );
 }
 
+
 Widget _buttonLogin(LoginController controller) {
   return Obx(() {
-    return ButtonLogin(
+    return ButtonLarge(
       label: "Login",
+      colorButton: AppColor.info,
       isEnabled: controller.isFilled.value,
-      onPressed: () {},
+      onPressed: controller.onLoginPressed,
     );
   });
 }

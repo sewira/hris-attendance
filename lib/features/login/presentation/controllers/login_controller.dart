@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hr_attendance/config/theme/app_assets.dart';
+import 'package:hr_attendance/shared/widgets/service/alert_service.dart';
 
 class LoginController extends GetxController {
 
@@ -11,7 +13,9 @@ class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final isFilled = false.obs;
-  
+  final showPasswordError = false.obs;
+  final passwordError = RxnString();
+
   @override
   void onInit() {
     super.onInit();
@@ -20,14 +24,30 @@ class LoginController extends GetxController {
   }
 
   void _checkFilled() {
-    isFilled.value =
-        emailController.text.isNotEmpty && passwordController.text.isNotEmpty;
-  }
+  isFilled.value = emailController.text.isNotEmpty;
 
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.onClose();
+  if (passwordController.text.isNotEmpty) {
+    passwordError.value = null;
   }
 }
+
+
+  void onLoginPressed() {
+  final email = emailController.text.trim();
+  final password = passwordController.text.trim();
+
+  if (email.isEmpty) {  
+    AlertService.show(animasi: AppAssets.lottieFailed, message: 'Input data terlebih dahulu',);
+    return;
+  }
+
+  if (password.isEmpty) {
+    passwordError.value = "Isi data dengan lengkap";
+    return;
+  }
+  passwordError.value = null;
+
+}
+}
+
+
