@@ -1,0 +1,11 @@
+import 'package:get/get.dart';
+import 'package:hr_attendance/features/main/presentation/controller/main_controller.dart';
+import 'package:hr_attendance/features/dashboard/presentation/controllers/dashboard_controller.dart';
+
+class MainBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => MainController());
+    Get.lazyPut(() => DashboardController());
+  }
+}

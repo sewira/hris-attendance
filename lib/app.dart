@@ -16,7 +16,7 @@ class App extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
       initialBinding: GlobalBinding(),
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.main,
       getPages: appPages,
 
       builder: (context, child) {

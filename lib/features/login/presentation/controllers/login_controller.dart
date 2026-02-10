@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
-import 'package:hr_attendance/shared/widgets/service/alert_service.dart';
+import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 
 class LoginController extends GetxController {
 
@@ -37,7 +37,7 @@ class LoginController extends GetxController {
   final password = passwordController.text.trim();
 
   if (email.isEmpty) {  
-    AlertService.show(animasi: AppAssets.lottieFailed, message: 'Input data terlebih dahulu',);
+    Alertdialog.show(animasi: AppAssets.lottieFailed, message: 'Input data terlebih dahulu',);
     return;
   }
 

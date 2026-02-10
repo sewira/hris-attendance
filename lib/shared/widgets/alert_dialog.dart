@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
-import '../organism/alert_widget.dart';
+import 'package:hr_attendance/shared/widgets/alert_widget.dart';
 
-class AlertService {
+class Alertdialog {
   static void show({
     required String animasi,
     required String message,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
-import 'package:hr_attendance/shared/widgets/molecules/button_widget.dart';
+import 'package:hr_attendance/shared/widgets/button_widget.dart';
 
 class AlertDialogCustom extends StatelessWidget {
   final String description;

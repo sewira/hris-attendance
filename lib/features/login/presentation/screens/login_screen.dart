@@ -5,7 +5,7 @@ import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/features/login/presentation/controllers/login_controller.dart';
 import 'package:hr_attendance/features/login/presentation/widgets/text_field_login.dart';
-import 'package:hr_attendance/shared/widgets/molecules/button_widget.dart';
+import 'package:hr_attendance/shared/widgets/button_widget.dart';
 import 'package:hr_attendance/features/login/presentation/widgets/error_builder.dart';
 
 class LoginScreen extends StatelessWidget {
