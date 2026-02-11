@@ -14,7 +14,7 @@ class MainScreen extends GetView<MainController> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      const DashboardScreen(),
+      DashboardScreen(onGoToCuti: () => controller.changeIndex(1)),
       const CutiScreen(),
       const ProfileScreen(),
     ];

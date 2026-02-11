@@ -3,28 +3,37 @@ import 'package:heroicons/heroicons.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/shared/widgets/button_widget.dart';
 
-class CardWidget extends StatelessWidget {
+class CardDashboard extends StatelessWidget {
   final String title;
   final String? subtitle;
-  final String jamMasuk;
-  final String jamPulang;
-  final VoidCallback? onClockIn;
+  final Color headerColor;
 
-  final Color? headerColor;
-  
-  const CardWidget({
+  final List<CardInfoItem> items;
+
+  final String? buttonLabel;
+  final VoidCallback? onPressed;
+  final Color? buttonColor;
+  final HeroIcon? icon;
+
+  const CardDashboard({
     super.key,
     required this.title,
     this.subtitle,
-    required this.jamMasuk,
-    required this.jamPulang,
-    this.onClockIn,
-    this.headerColor,
+    required this.headerColor,
+    required this.items,
+    this.buttonLabel,
+    this.onPressed,
+    this.buttonColor,
+    this.icon,
   });
+
+  bool get hasButton =>
+      buttonLabel != null && onPressed != null && buttonColor != null;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 190,
       decoration: BoxDecoration(
         color: AppColor.netral1,
         borderRadius: BorderRadius.circular(8),
@@ -37,89 +46,115 @@ class CardWidget extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+            height: 60,
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
-              color: headerColor ?? AppColor.danger, 
+              color: headerColor,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(8),
                 topRight: Radius.circular(8),
               ),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
                   style: const TextStyle(
-                    fontFamily: "Inter",
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColor.netral1,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle!,
-                  style: const TextStyle(
-                    fontFamily: "Inter",
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: AppColor.netral1,
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.netral1,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _jamItem("Jam masuk", jamMasuk),
-                _jamItem("Jam pulang", jamPulang),
-              ],
-            ),
-          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: items
+                            .map(
+                              (e) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: _infoItem(e.title, e.value),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: ButtonLarge(
-                label: "Clock in",
-                onPressed: onClockIn ?? () {},
-                isEnabled: onClockIn != null,
-                colorButton: AppColor.succes,
-                icon: const HeroIcon(HeroIcons.clock),
+                  if (hasButton)
+                    ButtonLarge(
+                      label: buttonLabel!,
+                      onPressed: onPressed!,
+                      isEnabled: true,
+                      colorButton: buttonColor!,
+                      icon: icon,
+                    ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _jamItem(String title, String value) {
+  Widget _infoItem(String title, String value) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           title,
           style: const TextStyle(
-            fontFamily: "Inter",
-            fontSize: 15,
+            fontSize: 16,
             color: AppColor.disableBorder,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontSize: 25,
+            color: AppColor.disableBorder,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );
   }
+}
+
+class CardInfoItem {
+  final String title;
+  final String value;
+
+  CardInfoItem({
+    required this.title,
+    required this.value,
+  });
 }
