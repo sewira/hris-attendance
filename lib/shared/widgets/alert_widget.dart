@@ -10,6 +10,7 @@ class AlertDialogCustom extends StatelessWidget {
   final double width;
   final double height;
   final bool isQuestion;
+  final bool showButton;
   final VoidCallback? onConfirm;
 
   const AlertDialogCustom({
@@ -19,6 +20,7 @@ class AlertDialogCustom extends StatelessWidget {
     this.width = 257,
     this.height = 257,
     this.isQuestion = false,
+    this.showButton = true,
     this.onConfirm,
   });
 
@@ -35,12 +37,7 @@ class AlertDialogCustom extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Lottie.asset(
-            lottie,
-            width: 97,
-            height: 97,
-            repeat: true,
-          ),
+          Lottie.asset(lottie, width: 97, height: 97),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: Text(
@@ -54,28 +51,29 @@ class AlertDialogCustom extends StatelessWidget {
             ),
           ),
 
-          isQuestion
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ButtonSmall(
-                      label: "Tutup",
-                      backgroundColor: AppColor.danger,
-                      onPressed: () => Get.back(),
-                    ),
-                    const SizedBox(width: 10),
-                    ButtonSmall(
-                      label: "Lanjut",
-                      backgroundColor: AppColor.info,
-                      onPressed: onConfirm ?? () {},
-                    ),
-                  ],
-                )
-              : ButtonSmall(
-                  label: "Tutup",
-                  backgroundColor: AppColor.danger,
-                  onPressed: () => Get.back(),
-                ),
+          if (showButton)
+            isQuestion
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ButtonSmall(
+                        label: "Tutup",
+                        backgroundColor: AppColor.danger,
+                        onPressed: () => Get.back(),
+                      ),
+                      const SizedBox(width: 10),
+                      ButtonSmall(
+                        label: "Lanjut",
+                        backgroundColor: AppColor.info,
+                        onPressed: onConfirm ?? () {},
+                      ),
+                    ],
+                  )
+                : ButtonSmall(
+                    label: "Tutup",
+                    backgroundColor: AppColor.danger,
+                    onPressed: () => Get.back(),
+                  ),
         ],
       ),
     );

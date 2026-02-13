@@ -7,6 +7,7 @@ import 'package:hr_attendance/features/dashboard/presentation/controllers/dashbo
 import 'package:hr_attendance/features/dashboard/presentation/widgets/card_widget.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/carousel_widget.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/status_widget.dart';
+import 'package:hr_attendance/shared/widgets/date_dialog.dart';
 import 'package:hr_attendance/shared/widgets/table_widget.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/modal_dialog.dart';
@@ -34,7 +35,7 @@ class DashboardScreen extends StatelessWidget {
         icon: const HeroIcon(HeroIcons.clock),
         onPressed: () {},
       ),
-      
+
       CardDashboard(
         title: "Anda sudah absen hari ini",
         subtitle: "Absensi anda",
@@ -87,7 +88,7 @@ class DashboardScreen extends StatelessWidget {
         color: AppColor.netral1,
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             CarouselWidget(
               controller: controller.pageController,
@@ -136,11 +137,9 @@ class DashboardScreen extends StatelessWidget {
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
                                   onPressed: () async {
-                                    await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime(2100),
+                                    await showDateDialog(
+                                      context,
+                                      controller.filterDateController,
                                     );
                                   },
                                 ),
@@ -181,7 +180,14 @@ class DashboardScreen extends StatelessWidget {
                         (index) => DataRow(
                           cells: [
                             DataCell(Center(child: Text("${index + 1}"))),
-                            DataCell(Center(child: Text("10 Jan - 13 Jan\n2026", textAlign: TextAlign.center,))),
+                            DataCell(
+                              Center(
+                                child: Text(
+                                  "10 Jan - 13 Jan\n2026",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
                             const DataCell(Center(child: Text("Rumah banjir"))),
                             const DataCell(Center(child: Text("-"))),
                             const DataCell(Center(child: Text("Admin"))),

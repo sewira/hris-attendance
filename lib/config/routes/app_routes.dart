@@ -20,5 +20,6 @@ final List<GetPage> appPages = [
     name: AppRoutes.main, 
     page: () => MainScreen(),
     binding: MainBinding(),
+    transition: Transition.fadeIn,
   ),
 ];

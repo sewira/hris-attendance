@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
+import 'package:hr_attendance/config/routes/app_routes.dart';
 
 class LoginController extends GetxController {
 
@@ -31,7 +32,6 @@ class LoginController extends GetxController {
   }
 }
 
-
   void onLoginPressed() {
   final email = emailController.text.trim();
   final password = passwordController.text.trim();
@@ -47,6 +47,7 @@ class LoginController extends GetxController {
   }
   passwordError.value = null;
 
+  Get.offAllNamed(AppRoutes.main);
 }
 }
 

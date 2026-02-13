@@ -6,4 +6,5 @@ abstract class AppAssets{
   static const icUser = "lib/shared/assets/images/ic_user.svg";
   static const lottieFailed = "lib/shared/assets/lottie/dismiss.json";
   static const lottieQuestion = "lib/shared/assets/lottie/question.json";
+  static const lottieSuccess = "lib/shared/assets/lottie/success.json";
 }

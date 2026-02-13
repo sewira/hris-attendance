@@ -6,6 +6,7 @@ class DashboardController extends GetxController {
   final PageController pageController = PageController(viewportFraction: 0.94);
   final RxInt currentPage = 0.obs;
 
+  final TextEditingController filterDateController = TextEditingController();
 
   final TextEditingController modalTextController = TextEditingController();
   final RxBool isModalValid = false.obs;
