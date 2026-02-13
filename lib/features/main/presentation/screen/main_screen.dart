@@ -4,7 +4,7 @@ import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:hr_attendance/features/main/presentation/controller/main_controller.dart';
 import 'package:hr_attendance/features/pengajuan%20cuti/presentation/screens/cuti_screen.dart';
-import 'package:hr_attendance/features/profile/profile_screen.dart';
+import 'package:hr_attendance/features/profile/presentation/screens/profile_screen.dart';
 import 'package:hr_attendance/shared/widgets/appbar_widget.dart';
 import 'package:hr_attendance/shared/widgets/navbar_widget.dart';
 

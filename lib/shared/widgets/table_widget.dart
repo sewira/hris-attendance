@@ -4,11 +4,15 @@ import 'package:hr_attendance/config/theme/app_color.dart';
 class CustomDataTable extends StatelessWidget {
   final List<DataColumn> columns;
   final List<DataRow> rows;
+  final bool showSearch;
+  final double tableHeight;
 
   const CustomDataTable({
     super.key,
     required this.columns,
     required this.rows,
+    this.showSearch = true,
+    this.tableHeight = 320, 
   });
 
   List<DataColumn> _styledColumns() {
@@ -16,10 +20,7 @@ class CustomDataTable extends StatelessWidget {
       return DataColumn(
         label: Container(
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(
-            vertical: 12,
-            horizontal: 16,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: DefaultTextStyle(
             style: const TextStyle(
               color: Colors.white,
@@ -37,35 +38,35 @@ class CustomDataTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: SizedBox(
-            width: 130,
-            height: 35,
-            child: TextField(
-              style: const TextStyle(
-                fontSize: 15,
-                color: AppColor.netral2,
-                fontWeight: FontWeight.normal,
-              ),
-              decoration: InputDecoration(
-                hintText: "Search...",
-                filled: true,
-                fillColor: Colors.white,
-                suffixIcon: const Icon(Icons.search),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
+        if (showSearch) ...[
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 130,
+              height: 35,
+              child: TextField(
+                style: const TextStyle(fontSize: 15, color: AppColor.netral2),
+                decoration: InputDecoration(
+                  hintText: "Search...",
+                  filled: true,
+                  fillColor: Colors.white,
+                  suffixIcon: const Icon(Icons.search),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+          const SizedBox(height: 12),
+        ],
 
-        const SizedBox(height: 12),
-
-        Expanded(
+        SizedBox(
+          height: tableHeight,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: Container(
@@ -76,10 +77,10 @@ class CustomDataTable extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
                       columnSpacing: 24,
-                      headingRowColor:
-                          MaterialStateProperty.all(AppColor.primary),
-                      dataRowColor:
-                          MaterialStateProperty.all(AppColor.netral1),
+                      headingRowColor: MaterialStateProperty.all(
+                        AppColor.primary,
+                      ),
+                      dataRowColor: MaterialStateProperty.all(AppColor.netral1),
                       columns: _styledColumns(),
                       rows: rows,
                     ),
