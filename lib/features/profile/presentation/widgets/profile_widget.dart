@@ -6,12 +6,14 @@ class ProfileItem extends StatelessWidget {
   final String label;
   final String value;
   final bool isIcon;
+  final VoidCallback? onTap; 
 
   const ProfileItem({
     super.key,
     required this.label,
     required this.value,
     this.isIcon = false,
+    this.onTap, 
   });
 
   @override
@@ -58,8 +60,11 @@ class ProfileItem extends StatelessWidget {
                 if (isIcon) ...[
                   const SizedBox(width: 8),
                   InkWell(
-                    onTap: () {},
-                    child: const HeroIcon(HeroIcons.pencilSquare, size: 24),
+                    onTap: onTap, 
+                    child: const HeroIcon(
+                      HeroIcons.pencilSquare,
+                      size: 26,
+                    ),
                   ),
                 ],
               ],

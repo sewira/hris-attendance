@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
+import 'package:hr_attendance/features/main/presentation/controller/main_controller.dart';
 import 'package:hr_attendance/shared/widgets/alert_widget.dart';
 
 class Alertdialog {
@@ -11,6 +12,9 @@ class Alertdialog {
     bool showButton = true,
     Duration? autoCloseDuration,
     VoidCallback? onConfirm,
+    String? redirectRoute,
+    bool replaceRoute = false,
+    int? changeMainIndex,
   }) {
     Get.dialog(
       Material(
@@ -30,11 +34,25 @@ class Alertdialog {
       barrierDismissible: false,
     );
 
-    /// 🔥 auto close logic
-    if (autoCloseDuration != null) {
-      Future.delayed(autoCloseDuration, () {
+    final duration = autoCloseDuration ?? const Duration(seconds: 4);
+
+    if (!showButton) {
+      Future.delayed(duration, () {
         if (Get.isDialogOpen ?? false) {
           Get.back();
+        }
+
+        if (changeMainIndex != null && Get.isRegistered<MainController>()) {
+          final mainController = Get.find<MainController>();
+          mainController.changeIndex(changeMainIndex);
+        }
+
+        if (redirectRoute != null) {
+          if (replaceRoute) {
+            Get.offAllNamed(redirectRoute);
+          } else {
+            Get.toNamed(redirectRoute);
+          }
         }
       });
     }

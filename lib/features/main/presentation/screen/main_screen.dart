@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:hr_attendance/features/main/presentation/controller/main_controller.dart';
-import 'package:hr_attendance/features/pengajuan%20cuti/presentation/screens/cuti_screen.dart';
+import 'package:hr_attendance/features/pengajuan_cuti/presentation/screens/cuti_screen.dart';
 import 'package:hr_attendance/features/profile/presentation/screens/profile_screen.dart';
 import 'package:hr_attendance/shared/widgets/appbar_widget.dart';
 import 'package:hr_attendance/shared/widgets/navbar_widget.dart';
@@ -27,7 +27,12 @@ class MainScreen extends GetView<MainController> {
             ? AppbarWidget(user: "udin")
             : null,
 
-        body: SafeArea(child: pages[controller.currentIndex.value]),
+        body: SafeArea(
+          child: IndexedStack(
+            index: controller.currentIndex.value,
+            children: pages,
+          ),
+        ),
 
         bottomNavigationBar: NavbarWidget(
           currentIndex: controller.currentIndex.value,

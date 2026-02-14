@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
-import 'package:hr_attendance/features/pengajuan%20cuti/presentation/widgets/text_fied_cuti.dart';
+import 'package:hr_attendance/shared/widgets/text_fied.dart';
 import 'package:hr_attendance/shared/widgets/button_widget.dart';
 import '../controllers/cuti_controller.dart';
 
-class CutiScreen extends StatelessWidget {
-  CutiScreen({super.key});
-
-  final CutiController controller = Get.find<CutiController>();
+class CutiScreen extends GetView<CutiController> {
+  const CutiScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

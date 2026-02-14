@@ -6,8 +6,13 @@ class DashboardController extends GetxController {
   final PageController pageController = PageController(viewportFraction: 0.94);
   final RxInt currentPage = 0.obs;
 
+  void onPageChanged(int index) {
+    currentPage.value = index;
+  }
+
   final TextEditingController filterDateController = TextEditingController();
 
+  //modal controller
   final TextEditingController modalTextController = TextEditingController();
   final RxBool isModalValid = false.obs;
   final RxBool isOverLimit = false.obs;
@@ -44,12 +49,6 @@ class DashboardController extends GetxController {
     isOverLimit.value = false;
     modalMessage.value = "";
   }
-
-  void onPageChanged(int index) {
-    currentPage.value = index;
-  }
-
-  
 
   @override
   void onClose() {

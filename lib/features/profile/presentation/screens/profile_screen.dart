@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:hr_attendance/config/routes/app_routes.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:hr_attendance/features/profile/presentation/widgets/profile_widget.dart';
+import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/shared/widgets/button_widget.dart';
 import 'package:hr_attendance/shared/widgets/date_dialog.dart';
 import 'package:hr_attendance/shared/widgets/table_widget.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends GetView<ProfileController> {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController controller = Get.find<ProfileController>();
 
     return DefaultTabController(
       length: 2,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -102,18 +103,31 @@ class ProfileScreen extends StatelessWidget {
                         label: "Email",
                         value: "tommy@gmail.com",
                       ),
-                      const ProfileItem(
+                      ProfileItem(
                         label: "Password",
-                        value: "************",
+                        value: "********",
                         isIcon: true,
+                        onTap: () {
+                          Get.toNamed(
+                            AppRoutes.password,
+                          );
+                        },
                       ),
+
                       const ProfileItem(label: "NIP", value: "1234567"),
 
                       const SizedBox(height: 40),
 
                       ButtonLarge(
                         label: "Logout",
-                        onPressed: () {},
+                        onPressed: () {
+                          Alertdialog.show(
+                            animasi: AppAssets.lottieQuestion, 
+                            message: "Ingin keluar dari akun anda", 
+                            isQuestion: true, 
+                            onConfirm: (){}
+                          );
+                        },
                         isEnabled: true,
                         colorButton: AppColor.danger,
                       ),

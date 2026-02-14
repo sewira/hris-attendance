@@ -8,13 +8,11 @@ import 'package:hr_attendance/features/login/presentation/widgets/text_field_log
 import 'package:hr_attendance/shared/widgets/button_widget.dart';
 import 'package:hr_attendance/features/login/presentation/widgets/error_builder.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final LoginController controller = Get.find<LoginController>();
-
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
@@ -36,7 +34,7 @@ class LoginScreen extends StatelessWidget {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: width < 360 ? 24 : 50,
+                  horizontal: width < 360 ? 24 : 57,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

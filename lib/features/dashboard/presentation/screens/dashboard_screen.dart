@@ -12,14 +12,13 @@ import 'package:hr_attendance/shared/widgets/table_widget.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/modal_dialog.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends GetView<DashboardController> {
   final VoidCallback onGoToCuti;
 
   const DashboardScreen({super.key, required this.onGoToCuti});
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller = Get.find<DashboardController>();
 
     final List<Widget> cards = [
       CardDashboard(

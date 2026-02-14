@@ -63,7 +63,7 @@ class CutiController extends GetxController {
       animasi: AppAssets.lottieSuccess,
       message: "Pengisian anda berhasil",
       showButton: false,
-      autoCloseDuration: const Duration(seconds: 4),
+      changeMainIndex: 0,
     );
   }
 
