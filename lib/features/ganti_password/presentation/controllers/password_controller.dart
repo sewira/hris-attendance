@@ -9,7 +9,6 @@ class PasswordController extends GetxController {
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-
   final formKey = GlobalKey<FormState>();
 
   final newPasswordError = RxnString();
@@ -32,8 +31,7 @@ class PasswordController extends GetxController {
     final confirmPass = confirmPasswordController.text;
 
     if (oldPass.isNotEmpty && newPass.isNotEmpty && oldPass == newPass) {
-      newPasswordError.value =
-          "password tidak boleh sama dengan yang lama";
+      newPasswordError.value = "password tidak boleh sama dengan yang lama";
     } else {
       newPasswordError.value = null;
     }
@@ -60,17 +58,18 @@ class PasswordController extends GetxController {
   void submit() {
     if (!isFormValid.value) {
       Alertdialog.show(
-        animasi: AppAssets.lottieFailed, 
-        message: "Data tidak lengkap"
+        animasi: AppAssets.lottieFailed,
+        message: "Data tidak lengkap",
       );
       return;
     }
- 
+
     Alertdialog.show(
-      animasi: AppAssets.lottieSuccess, 
-      message: "Ganti password berhasil", 
-      showButton: false, 
-      redirectRoute: AppRoutes.login
+      animasi: AppAssets.lottieSuccess,
+      message: "Ganti password berhasil",
+      showButton: false,
+      replaceRoute: true,
+      redirectRoute: AppRoutes.login,
     );
   }
 
