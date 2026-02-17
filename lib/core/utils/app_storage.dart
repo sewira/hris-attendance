@@ -5,8 +5,9 @@ class AppStorage {
 
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
+  static const String _userNameKey = 'user_name';
 
-  // Token
+  //token
   static Future<void> saveToken(String token) async {
     await _box.write(_tokenKey, token);
   }
@@ -19,7 +20,11 @@ class AppStorage {
     await _box.remove(_tokenKey);
   }
 
-  // User ID
+  static bool isLoggedIn() {
+    return getToken() != null;
+  }
+
+  //ID User
   static Future<void> saveUserId(String userId) async {
     await _box.write(_userIdKey, userId);
   }
@@ -28,7 +33,15 @@ class AppStorage {
     return _box.read<String>(_userIdKey);
   }
 
-  // Clear all
+  //User name
+  static Future<void> saveUserName(String name) async {
+    await _box.write(_userNameKey, name);
+  }
+
+  static String? getUserName() {
+    return _box.read<String>(_userNameKey);
+  }
+
   static Future<void> clearAll() async {
     await _box.erase();
   }

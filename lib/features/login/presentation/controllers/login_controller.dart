@@ -82,6 +82,7 @@ class LoginController extends GetxController {
 
       await AppStorage.saveToken(user.token);
       await AppStorage.saveUserId(user.id.toString());
+      await AppStorage.saveUserName(user.fullName);
 
       Get.offAllNamed(AppRoutes.main);
 
