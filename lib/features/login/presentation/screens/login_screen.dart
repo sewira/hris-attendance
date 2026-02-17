@@ -34,12 +34,12 @@ class LoginScreen extends GetView<LoginController> {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: width < 360 ? 24 : 57,
+                  horizontal: width < 360 ? 24 : 50,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(height: height * 0.13),
+                    SizedBox(height: height * 0.12),
                     _logo(),
                     const SizedBox(height: 20),
                     _title(),
@@ -118,12 +118,10 @@ Widget _textForm(BuildContext context, LoginController controller) {
                 obscureText: controller.obscurePassword.value,
                 onToggle: controller.togglePassword,
               ),
-
               ErrorBuilder(
-                message: controller.passwordError.value,
+                message: controller.formError.value,
                 child: ErrorMassage(
-                  errorMassage:
-                      controller.passwordError.value ?? "",
+                  errorMassage: controller.formError.value ?? "",
                 ),
               ),
             ],
@@ -134,13 +132,15 @@ Widget _textForm(BuildContext context, LoginController controller) {
   );
 }
 
-
 Widget _buttonLogin(LoginController controller) {
   return Obx(() {
+    final isInvalid = controller.isFormInvalid;
+    final isLoading = controller.isLoading.value;
+
     return ButtonLarge(
-      label: "Login",
-      colorButton: AppColor.info,
-      isEnabled: controller.isFilled.value,
+      label: isLoading ? "Loading..." : "Login",
+      colorButton: isInvalid ? AppColor.disable : AppColor.info,
+      isEnabled: !isLoading, 
       onPressed: controller.onLoginPressed,
     );
   });
