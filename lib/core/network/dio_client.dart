@@ -26,18 +26,32 @@ class DioClient {
 
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
 
-          options.headers["x-api-key"] = " hris-api-key-123";
+          // =========================
+          // API KEY
+          // =========================
+          options.headers["x-api-key"] = "hris-api-key-123";
 
+          // =========================
+          // AUTHORIZATION (skip login & register)
+          // =========================
           final token = AppStorage.getToken();
-          if (token != null) {
+
+          final isAuthEndpoint =
+              options.path.contains('/auth/login') ||
+              options.path.contains('/auth/register');
+
+          if (token != null && !isAuthEndpoint) {
             options.headers["Authorization"] = "Bearer $token";
           }
 
           return handler.next(options);
         },
 
+        // =========================
+        // RESPONSE
+        // =========================
         onResponse: (response, handler) {
 
           if (response.statusCode != 200) {
@@ -53,8 +67,12 @@ class DioClient {
           return handler.next(response);
         },
 
+        // =========================
+        // ERROR HANDLER
+        // =========================
         onError: (error, handler) async {
 
+          // Kalau token expired / unauthorized
           if (error.response?.statusCode == 401) {
             await AppStorage.clearAll();
             Get.offAllNamed(AppRoutes.login);
@@ -65,6 +83,9 @@ class DioClient {
       ),
     );
 
+    // =========================
+    // LOGGING
+    // =========================
     dio.interceptors.add(
       LogInterceptor(
         requestBody: true,

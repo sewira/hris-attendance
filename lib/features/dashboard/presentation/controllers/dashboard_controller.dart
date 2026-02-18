@@ -1,19 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../domain/usecases/get_attendance_history_usecase.dart';
+import '../../data/models/attendance_model.dart';
 
 class DashboardController extends GetxController {
+  final GetAttendanceHistoryUsecase getAttendanceHistoryUsecase;
 
-  final PageController pageController = PageController(viewportFraction: 0.94);
+  DashboardController(this.getAttendanceHistoryUsecase);
+
+  // =============================
+  // CAROUSEL
+  // =============================
+  final PageController pageController =
+      PageController(viewportFraction: 0.94);
+
   final RxInt currentPage = 0.obs;
 
   void onPageChanged(int index) {
     currentPage.value = index;
   }
 
-  final TextEditingController filterDateController = TextEditingController();
+  // =============================
+  // ATTENDANCE STATE (NEW)
+  // =============================
 
-  //modal controller
-  final TextEditingController modalTextController = TextEditingController();
+  final RxList<AttendanceModel> attendanceList =
+      <AttendanceModel>[].obs;
+
+  final RxBool isAttendanceLoading = false.obs;
+  final RxBool isAttendanceError = false.obs;
+
+  Future<void> fetchAttendance() async {
+    try {
+      isAttendanceLoading.value = true;
+      isAttendanceError.value = false;
+
+      final result = await getAttendanceHistoryUsecase();
+      attendanceList.value = result;
+    } catch (e) {
+      isAttendanceError.value = true;
+    } finally {
+      isAttendanceLoading.value = false;
+    }
+  }
+
+  // =============================
+  // MODAL CONTROLLER (TIDAK DIUBAH)
+  // =============================
+
+  final TextEditingController modalTextController =
+      TextEditingController();
   final RxBool isModalValid = false.obs;
   final RxBool isOverLimit = false.obs;
   final RxInt modalLength = 0.obs;
@@ -48,6 +84,12 @@ class DashboardController extends GetxController {
     isModalValid.value = false;
     isOverLimit.value = false;
     modalMessage.value = "";
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchAttendance(); // NEW
   }
 
   @override

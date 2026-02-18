@@ -24,7 +24,7 @@ class MainScreen extends GetView<MainController> {
         backgroundColor: AppColor.netral1,
 
         appBar: controller.currentIndex.value == 0
-            ? AppbarWidget(user: "udin")
+            ? AppbarWidget()
             : null,
 
         body: SafeArea(

@@ -7,7 +7,6 @@ import 'package:hr_attendance/features/dashboard/presentation/controllers/dashbo
 import 'package:hr_attendance/features/dashboard/presentation/widgets/card_widget.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/carousel_widget.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/status_widget.dart';
-import 'package:hr_attendance/shared/widgets/date_dialog.dart';
 import 'package:hr_attendance/shared/widgets/table_widget.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/modal_dialog.dart';
@@ -19,7 +18,6 @@ class DashboardScreen extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
-
     final List<Widget> cards = [
       CardDashboard(
         title: "Anda belum absen hari ini!",
@@ -116,54 +114,49 @@ class DashboardScreen extends GetView<DashboardController> {
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 15),
                 child: TabBarView(
                   children: [
-                    CustomDataTable(
-                      columns: [
-                        const DataColumn(label: Text("No")),
+                    Obx(() {
+                      if (controller.isAttendanceLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                        DataColumn(
-                          label: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text("Tanggal"),
-                                IconButton(
-                                  icon: const HeroIcon(
-                                    HeroIcons.calendar,
-                                    size: 20,
-                                    color: AppColor.netral1,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: () async {
-                                    await showDateDialog(
-                                      context,
-                                      controller.filterDateController,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      if (controller.isAttendanceError.value) {
+                        return const Center(child: Text("Gagal memuat data"));
+                      }
 
-                        const DataColumn(label: Text("Durasi Kerja")),
-                        const DataColumn(label: Text("Clock In")),
-                        const DataColumn(label: Text("Clock Out")),
-                      ],
-                      rows: List.generate(
-                        10,
-                        (index) => DataRow(
-                          cells: [
-                            DataCell(Center(child: Text("${index + 1}"))),
-                            const DataCell(Center(child: Text("20 Jan 2026"))),
-                            const DataCell(Center(child: Text("8 Jam"))),
-                            const DataCell(Center(child: Text("08.00"))),
-                            const DataCell(Center(child: Text("17.00"))),
-                          ],
-                        ),
-                      ),
-                    ),
+                      if (controller.attendanceList.isEmpty) {
+                        return const Center(
+                          child: Text("Belum ada data absensi"),
+                        );
+                      }
+                      
+
+                      return CustomDataTable(
+                        showSearch: true,
+                        columns: [
+                          const DataColumn(label: Text("No")),
+                          const DataColumn(label: Text("Tanggal")),
+                          const DataColumn(label: Text("Durasi Kerja")),
+                          const DataColumn(label: Text("Clock In")),
+                          const DataColumn(label: Text("Clock Out")),
+                        ],
+                        rows: controller.attendanceList.asMap().entries.map((
+                          entry,
+                        ) {
+                          final index = entry.key;
+                          final item = entry.value;
+
+                          return DataRow(
+                            cells: [
+                              DataCell(Center(child: Text("${index + 1}"))),
+                              DataCell(Center(child: Text(item.date))),
+                              DataCell(Center(child: Text(item.duration))),
+                              DataCell(Center(child: Text(item.clockIn))),
+                              DataCell(Center(child: Text(item.clockOut))),
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    }),
 
                     CustomDataTable(
                       columns: const [
