@@ -10,39 +10,34 @@ class TextFieldLogin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          controller: controller,
-          style: const TextStyle(
-            fontFamily: "Inter",
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(
+        fontFamily: "Inter",
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+        color: AppColor.disableBorder,
+      ),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(
+          fontFamily: "Inter",
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+          color: AppColor.disableBorder,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColor.disableBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(
             color: AppColor.disableBorder,
-          ),
-
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              fontFamily: "Inter",
-              fontSize: 20,
-              color: AppColor.disableBorder,
-              fontWeight: FontWeight.w500,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColor.disableBorder),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: AppColor.disableBorder,
-                width: 2,
-              ),
-            ),
+            width: 2,
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -64,7 +59,6 @@ class TextFieldPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      
       controller: controller,
       obscureText: obscureText,
       style: const TextStyle(

@@ -134,14 +134,15 @@ Widget _textForm(BuildContext context, LoginController controller) {
 
 Widget _buttonLogin(LoginController controller) {
   return Obx(() {
-    final isInvalid = controller.isFormInvalid;
+    final isInvalid = controller.isFormInvalidRx.value;
     final isLoading = controller.isLoading.value;
 
     return ButtonLarge(
       label: isLoading ? "Loading..." : "Login",
       colorButton: isInvalid ? AppColor.disable : AppColor.info,
-      isEnabled: !isLoading, 
+      isEnabled: !isLoading,
       onPressed: controller.onLoginPressed,
     );
   });
 }
+

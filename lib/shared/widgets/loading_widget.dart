@@ -24,8 +24,8 @@ class LoadingDialogCustom extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Lottie.asset(AppAssets.lottieLoading),
-          const SizedBox(height: 15),
+          Lottie.asset(AppAssets.lottieLoading,),
+          const SizedBox(height: 30),
           Text(
             message,
             textAlign: TextAlign.center,
@@ -34,7 +34,7 @@ class LoadingDialogCustom extends StatelessWidget {
               fontSize: 18,
               color: AppColor.netral2,
             ),
-          ),
+          )
         ],
       ),
     );
