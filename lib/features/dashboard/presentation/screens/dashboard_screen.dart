@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
+import 'package:hr_attendance/core/utils/extensions.dart';
 import 'package:hr_attendance/features/dashboard/presentation/controllers/dashboard_controller.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/card_widget.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/carousel_widget.dart';
@@ -109,86 +110,285 @@ class DashboardScreen extends GetView<DashboardController> {
 
             const SizedBox(height: 15),
 
+            //riwayat absensi
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 15),
                 child: TabBarView(
                   children: [
-                    Obx(() {
-                      if (controller.isAttendanceLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (controller.isAttendanceError.value) {
-                        return const Center(child: Text("Gagal memuat data"));
-                      }
-
-                      if (controller.attendanceList.isEmpty) {
-                        return const Center(
-                          child: Text("Belum ada data absensi"),
-                        );
-                      }
-                      
-
-                      return CustomDataTable(
-                        showSearch: true,
-                        columns: [
-                          const DataColumn(label: Text("No")),
-                          const DataColumn(label: Text("Tanggal")),
-                          const DataColumn(label: Text("Durasi Kerja")),
-                          const DataColumn(label: Text("Clock In")),
-                          const DataColumn(label: Text("Clock Out")),
-                        ],
-                        rows: controller.attendanceList.asMap().entries.map((
-                          entry,
-                        ) {
-                          final index = entry.key;
-                          final item = entry.value;
-
-                          return DataRow(
-                            cells: [
-                              DataCell(Center(child: Text("${index + 1}"))),
-                              DataCell(Center(child: Text(item.date))),
-                              DataCell(Center(child: Text(item.duration))),
-                              DataCell(Center(child: Text(item.clockIn))),
-                              DataCell(Center(child: Text(item.clockOut))),
-                            ],
-                          );
-                        }).toList(),
-                      );
-                    }),
-
-                    CustomDataTable(
-                      columns: const [
-                        DataColumn(label: Text("No")),
-                        DataColumn(label: Text("Tanggal Cuti")),
-                        DataColumn(label: Text("Alasan Cuti")),
-                        DataColumn(label: Text("Catatan HR")),
-                        DataColumn(label: Text("Last User")),
-                        DataColumn(label: Text("Status Cuti")),
-                      ],
-                      rows: List.generate(
-                        10,
-                        (index) => DataRow(
-                          cells: [
-                            DataCell(Center(child: Text("${index + 1}"))),
-                            DataCell(
-                              Center(
-                                child: Text(
-                                  "10 Jan - 13 Jan\n2026",
-                                  textAlign: TextAlign.center,
+                    Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 160,
+                            height: 38,
+                            child: TextField(
+                              onChanged: controller.onAttendanceSearchChanged,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColor.netral2,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "Search...",
+                                filled: true,
+                                fillColor: Colors.white,
+                                suffixIcon: const Icon(Icons.search, size: 18),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: BorderSide(
+                                    color: AppColor.disableBorder,
+                                    width: 1.5,
+                                  ),
                                 ),
                               ),
                             ),
-                            const DataCell(Center(child: Text("Rumah banjir"))),
-                            const DataCell(Center(child: Text("-"))),
-                            const DataCell(Center(child: Text("Admin"))),
-                            const DataCell(
-                              Center(child: StatusWidget(status: "Approve")),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 12),
+
+                        //tabel absensi
+                        Expanded(
+                          child: Obx(() {
+                            return Stack(
+                              children: [
+                                CustomDataTable(
+                                  columns: const [
+                                    DataColumn(label: Text("No")),
+                                    DataColumn(label: Text("Tanggal")),
+                                    DataColumn(label: Text("Durasi Kerja")),
+                                    DataColumn(label: Text("Clock In")),
+                                    DataColumn(label: Text("Clock Out")),
+                                  ],
+                                  rows: controller.attendanceList
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                        final index = entry.key;
+                                        final item = entry.value;
+
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(
+                                              Center(
+                                                child: Text("${index + 1}"),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Center(child: Text(item.date)),
+                                            ),
+                                            DataCell(
+                                              Center(
+                                                child: Text(item.duration),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Center(
+                                                child: Text(
+                                                  item.clockIn,
+                                                  style: TextStyle(
+                                                    color: item.clockIn
+                                                        .getClockInColor(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Center(
+                                                child: Text(
+                                                  item.clockOut,
+                                                  style: TextStyle(
+                                                    color: item.clockOut
+                                                        .getClockOutColor(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      })
+                                      .toList(),
+                                ),
+
+                                if (controller.attendanceList.isEmpty &&
+                                    !controller.isAttendanceLoading.value &&
+                                    !controller.isAttendanceError.value)
+                                  Positioned.fill(
+                                    child: Center(
+                                      child: Text(
+                                        controller.attendanceEmptyMessage,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+
+                    //riwayat cuti
+                    Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 160,
+                            height: 38,
+                            child: TextField(
+                              onChanged: controller.onLeaveSearchChanged,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColor.netral2,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "Search...",
+                                filled: true,
+                                fillColor: Colors.white,
+                                suffixIcon: const Icon(Icons.search, size: 18),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        //tabel cuti
+                        Expanded(
+                          child: Obx(() {
+                            return Stack(
+                              children: [
+                                CustomDataTable(
+                                  columnWidths: [60, 140, 180, 180, 140, 120],
+                                  columns: const [
+                                    DataColumn(label: Text("No")),
+                                    DataColumn(label: Text("Tanggal Cuti")),
+                                    DataColumn(label: Text("Alasan Cuti")),
+                                    DataColumn(label: Text("Catatan HR")),
+                                    DataColumn(label: Text("Last User")),
+                                    DataColumn(label: Text("Status Cuti")),
+                                  ],
+                                  rows: controller.leaveList
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                        final index = entry.key;
+                                        final item = entry.value;
+
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(
+                                              SizedBox(
+                                                width: 60,
+                                                child: Center(
+                                                  child: Text("${index + 1}"),
+                                                ),
+                                              ),
+                                            ),
+
+                                            DataCell(
+                                              SizedBox(
+                                                width: 140,
+                                                child: Center(
+                                                  child: Text(
+                                                    item.leaveDate,
+                                                    textAlign: TextAlign.center,
+                                                    softWrap: true,
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            DataCell(
+                                              SizedBox(
+                                                width: 180,
+                                                child: Center(
+                                                  child: Text(
+                                                    item.reason,
+                                                    softWrap: true,
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            DataCell(
+                                              SizedBox(
+                                                width: 180,
+                                                child: Center(
+                                                  child: Text(
+                                                    item.hrNote,
+                                                    softWrap: true,
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            DataCell(
+                                              SizedBox(
+                                                width: 140,
+                                                child: Center(
+                                                  child: Text(
+                                                    item.approvedBy,
+                                                    softWrap: true,
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            DataCell(
+                                              SizedBox(
+                                                width: 120,
+                                                child: Center(
+                                                  child: StatusWidget(
+                                                    status: item.status,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      })
+                                      .toList(),
+                                ),
+
+                                if (controller.leaveList.isEmpty &&
+                                    !controller.isLeaveLoading.value &&
+                                    !controller.isLeaveError.value)
+                                  Positioned.fill(
+                                    child: Center(
+                                      child: Text(controller.leaveEmptyMessage),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }),
+                        ),
+                      ],
                     ),
                   ],
                 ),

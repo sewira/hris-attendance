@@ -152,57 +152,57 @@ class ProfileScreen extends GetView<ProfileController> {
 
                       SizedBox(height: 20),
 
-                      CustomDataTable(
-                        showSearch: false,
-                        columns: [
-                          const DataColumn(label: Text("No")),
+                      // CustomDataTable(
+                      //   showSearch: false,
+                      //   columns: [
+                      //     const DataColumn(label: Text("No")),
 
-                          DataColumn(
-                            label: Center(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text("Tanggal"),
-                                  IconButton(
-                                    icon: const HeroIcon(
-                                      HeroIcons.calendar,
-                                      size: 20,
-                                      color: AppColor.netral1,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () async {
-                                      await showDateDialog(
-                                        context,
-                                        controller.filterDateController,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                      //     DataColumn(
+                      //       label: Center(
+                      //         child: Row(
+                      //           mainAxisSize: MainAxisSize.min,
+                      //           mainAxisAlignment: MainAxisAlignment.center,
+                      //           children: [
+                      //             const Text("Tanggal"),
+                      //             IconButton(
+                      //               icon: const HeroIcon(
+                      //                 HeroIcons.calendar,
+                      //                 size: 20,
+                      //                 color: AppColor.netral1,
+                      //               ),
+                      //               padding: EdgeInsets.zero,
+                      //               constraints: const BoxConstraints(),
+                      //               onPressed: () async {
+                      //                 await showDateDialog(
+                      //                   context,
+                      //                   controller.filterDateController,
+                      //                 );
+                      //               },
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ),
 
-                          const DataColumn(label: Text("Durasi Kerja")),
-                          const DataColumn(label: Text("Clock In")),
-                          const DataColumn(label: Text("Clock Out")),
-                        ],
-                        rows: List.generate(
-                          10,
-                          (index) => DataRow(
-                            cells: [
-                              DataCell(Center(child: Text("${index + 1}"))),
-                              const DataCell(
-                                Center(child: Text("20 Jan 2026")),
-                              ),
-                              const DataCell(Center(child: Text("8 Jam"))),
-                              const DataCell(Center(child: Text("08.00"))),
-                              const DataCell(Center(child: Text("17.00"))),
-                            ],
-                          ),
-                        ),
-                      ),
+                      //     const DataColumn(label: Text("Durasi Kerja")),
+                      //     const DataColumn(label: Text("Clock In")),
+                      //     const DataColumn(label: Text("Clock Out")),
+                      //   ],
+                      //   rows: List.generate(
+                      //     10,
+                      //     (index) => DataRow(
+                      //       cells: [
+                      //         DataCell(Center(child: Text("${index + 1}"))),
+                      //         const DataCell(
+                      //           Center(child: Text("20 Jan 2026")),
+                      //         ),
+                      //         const DataCell(Center(child: Text("8 Jam"))),
+                      //         const DataCell(Center(child: Text("08.00"))),
+                      //         const DataCell(Center(child: Text("17.00"))),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],

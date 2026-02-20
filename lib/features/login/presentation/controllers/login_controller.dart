@@ -18,6 +18,7 @@ class LoginController extends GetxController {
   final obscurePassword = true.obs;
   final isLoading = false.obs;
   final formError = RxnString();
+  final isFormInvalidRx = true.obs;
 
   void togglePassword() {
     obscurePassword.value = !obscurePassword.value;
@@ -38,22 +39,19 @@ class LoginController extends GetxController {
 
     if (email.isNotEmpty && !GetUtils.isEmail(email)) {
       formError.value = "Format email tidak valid";
-      return;
+    } else if (password.isNotEmpty && password.length < 8) {
+      formError.value = "Password minimal 8 karakter";
     }
 
-    if (password.isNotEmpty && password.length < 8) {
-      formError.value = "Password minimal 8 karakter";
-      return;
-    }
+    isFormInvalidRx.value =
+        email.isEmpty || password.isEmpty || formError.value != null;
   }
 
   bool get isFormInvalid {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    return email.isEmpty ||
-        password.isEmpty ||
-        formError.value != null;
+    return email.isEmpty || password.isEmpty || formError.value != null;
   }
 
   Future<void> onLoginPressed() async {
@@ -68,7 +66,13 @@ class LoginController extends GetxController {
       return;
     }
 
-    if (formError.value != null) {
+    if (!GetUtils.isEmail(email)) {
+      formError.value = "Format email tidak valid";
+      return;
+    }
+
+    if (password.length < 8) {
+      formError.value = "Password minimal 8 karakter";
       return;
     }
 
@@ -78,19 +82,48 @@ class LoginController extends GetxController {
 
       final user = await loginUsecase(email, password);
 
-      LoadingDialog.close();
-
       await AppStorage.saveToken(user.token);
       await AppStorage.saveUserId(user.id.toString());
       await AppStorage.saveUserName(user.fullName);
 
-      Get.offAllNamed(AppRoutes.main);
+      LoadingDialog.close();
+      isLoading.value = false;
 
+      if (user.isNewEmployee) {
+        Alertdialog.show(
+          animasi: AppAssets.lottieQuestion,
+          isQuestion: true,
+          message:
+              "Selamat datang di HRIS mini, ingin langsung ganti password?",
+          cancelLabel: "Tidak",
+          confirmLabel: "Iya",
+          onCancel: () {
+            user.isNewEmployee = false;
+            Get.offAllNamed(AppRoutes.main);
+          },
+          onConfirm: () {
+            user.isNewEmployee = false;
+            Get.toNamed(AppRoutes.password);
+          },
+        );
+      } else {
+        Get.offAllNamed(AppRoutes.main);
+      }
     } catch (e) {
       LoadingDialog.close();
-      formError.value = "Email atau password salah";
-    } finally {
       isLoading.value = false;
+
+      final error = e.toString().replaceAll("Exception: ", "");
+
+      if (error == "BLOCKED_ACCOUNT") {
+        Alertdialog.show(
+          animasi: AppAssets.lottieFailed,
+          message: "Akun anda terblokir silahkan hubungi admin",
+        );
+        return;
+      }
+
+      formError.value = error;
     }
   }
 

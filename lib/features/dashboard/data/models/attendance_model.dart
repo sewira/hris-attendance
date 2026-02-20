@@ -1,4 +1,4 @@
-import 'package:intl/intl.dart';
+import 'package:hr_attendance/core/utils/extensions.dart';
 
 class AttendanceModel {
   final String date;
@@ -14,20 +14,18 @@ class AttendanceModel {
   });
 
   factory AttendanceModel.fromJson(Map<String, dynamic> json) {
-    return AttendanceModel(
-      date: _formatDate(json['date']),
-      duration: json['duration'] ?? "-",
-      clockIn: json['clock_in'] ?? "-",
-      clockOut: json['clock_out'] ?? "-",
-    );
-  }
+  return AttendanceModel(
+    date: (json['date'] ?? "-").toString().toFormattedDate(),
+    duration: (json['duration'] ?? "-")
+        .toString()
+        .toFormattedDuration(),
+    clockIn: (json['clock_in'] ?? "-")
+        .toString()
+        .toFormattedClock(),
+    clockOut: (json['clock_out'] ?? "-")
+        .toString()
+        .toFormattedClock(),
+  );
+}
 
-  static String _formatDate(String rawDate) {
-    try {
-      final date = DateTime.parse(rawDate);
-      return DateFormat("dd MMM yyyy", "id_ID").format(date);
-    } catch (_) {
-      return rawDate;
-    }
-  }
 }

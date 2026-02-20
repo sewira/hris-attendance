@@ -3,14 +3,16 @@ class UserModel {
   final String fullName;
   final String email;
   final String token;
-  final String message;
+  final String role;
+  bool isNewEmployee;
 
   UserModel({
     required this.id,
     required this.fullName,
     required this.email,
     required this.token,
-    required this.message,
+    required this.role,
+    required this.isNewEmployee,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -21,7 +23,8 @@ class UserModel {
       fullName: data["full_name"],
       email: data["email"],
       token: data["token"],
-      message: json["message"],
+      role: data["role"],
+      isNewEmployee: data["is_new_employee"] ?? false,
     );
   }
 }

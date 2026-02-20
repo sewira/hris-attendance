@@ -11,7 +11,13 @@ class Alertdialog {
     bool isQuestion = false,
     bool showButton = true,
     Duration? autoCloseDuration,
+
     VoidCallback? onConfirm,
+    VoidCallback? onCancel,
+
+    String confirmLabel = "Lanjut",
+    String cancelLabel = "Tutup",
+
     String? redirectRoute,
     bool replaceRoute = false,
     int? changeMainIndex,
@@ -26,6 +32,9 @@ class Alertdialog {
             isQuestion: isQuestion,
             showButton: showButton,
             onConfirm: onConfirm,
+            onCancel: onCancel,
+            confirmLabel: confirmLabel,
+            cancelLabel: cancelLabel,
             width: isQuestion ? 300 : 257,
             height: isQuestion ? 270 : 257,
           ),

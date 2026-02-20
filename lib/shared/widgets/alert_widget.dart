@@ -11,7 +11,12 @@ class AlertDialogCustom extends StatelessWidget {
   final double height;
   final bool isQuestion;
   final bool showButton;
+
   final VoidCallback? onConfirm;
+  final VoidCallback? onCancel;
+
+  final String confirmLabel;
+  final String cancelLabel;
 
   const AlertDialogCustom({
     super.key,
@@ -22,6 +27,9 @@ class AlertDialogCustom extends StatelessWidget {
     this.isQuestion = false,
     this.showButton = true,
     this.onConfirm,
+    this.onCancel,
+    this.confirmLabel = "Lanjut",
+    this.cancelLabel = "Tutup",
   });
 
   @override
@@ -38,6 +46,7 @@ class AlertDialogCustom extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Lottie.asset(lottie, width: 97, height: 97),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: Text(
@@ -57,22 +66,22 @@ class AlertDialogCustom extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ButtonSmall(
-                        label: "Tutup",
+                        label: cancelLabel,
                         backgroundColor: AppColor.danger,
-                        onPressed: () => Get.back(),
+                        onPressed: onCancel ?? () => Get.back(),
                       ),
                       const SizedBox(width: 10),
                       ButtonSmall(
-                        label: "Lanjut",
+                        label: confirmLabel,
                         backgroundColor: AppColor.info,
                         onPressed: onConfirm ?? () {},
                       ),
                     ],
                   )
                 : ButtonSmall(
-                    label: "Tutup",
+                    label: cancelLabel,
                     backgroundColor: AppColor.danger,
-                    onPressed: () => Get.back(),
+                    onPressed: onCancel ?? () => Get.back(),
                   ),
         ],
       ),

@@ -6,7 +6,9 @@ class GetAttendanceHistoryUsecase {
 
   GetAttendanceHistoryUsecase(this.repository);
 
-  Future<List<AttendanceModel>> call() {
-    return repository.getAttendanceHistory();
+  Future<List<AttendanceModel>> call({
+    String? search,
+  }) {
+    return repository.getAttendanceHistory(search: search);
   }
 }
