@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hr_attendance/features/attendance_history_shared/data/models/attendance_history_model.dart';
+import 'package:hr_attendance/features/attendance_history_shared/domain/usecases/get_attendance_history_month.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
-import '../../domain/usecases/get_attendance_history_usecase.dart';
 import '../../domain/usecases/get_leave_history.dart';
-import '../../data/models/attendance_model.dart';
 
 class DashboardController extends GetxController {
-  final GetAttendanceHistoryUsecase getAttendanceHistoryUsecase;
+  final GetAttendanceHistoryMonthUsecase getAttendanceHistoryUsecase;
   final GetLeaveHistoryUsecase getLeaveHistoryUsecase;
 
   DashboardController(
@@ -15,25 +15,21 @@ class DashboardController extends GetxController {
     this.getLeaveHistoryUsecase,
   );
 
-  // Carousel
+  //carrosel
   final PageController pageController = PageController(viewportFraction: 0.94);
   final RxInt currentPage = 0.obs;
   void onPageChanged(int index) => currentPage.value = index;
-
 
   //absensi
   final RxList<AttendanceModel> attendanceList = <AttendanceModel>[].obs;
   final RxBool isAttendanceLoading = false.obs;
   final RxBool isAttendanceError = false.obs;
-  final RxString attendanceSearchQuery = "".obs;
+  final RxBool isSearchingAttendance = false.obs;
 
   Timer? _attendanceDebounce;
-  final RxBool isSearching = false.obs;
-  final RxBool hasLoadedOnce = false.obs;
 
   void onAttendanceSearchChanged(String value) {
-    attendanceSearchQuery.value = value;
-    isSearching.value = value.trim().isNotEmpty;
+    isSearchingAttendance.value = value.trim().isNotEmpty;
 
     _attendanceDebounce?.cancel();
     _attendanceDebounce = Timer(
@@ -46,16 +42,13 @@ class DashboardController extends GetxController {
     try {
       isAttendanceLoading.value = true;
       isAttendanceError.value = false;
-      isSearching.value = search != null && search.isNotEmpty;
 
       final result = await getAttendanceHistoryUsecase(search: search);
+
       attendanceList.assignAll(result);
-      hasLoadedOnce.value = true;
-    } catch (e) {
+    } catch (_) {
       attendanceList.clear();
-      if (!isSearching.value) {
-        isAttendanceError.value = true;
-      }
+      isAttendanceError.value = false;
     } finally {
       isAttendanceLoading.value = false;
     }
@@ -64,24 +57,26 @@ class DashboardController extends GetxController {
   String get attendanceEmptyMessage {
     if (isAttendanceLoading.value) return "";
     if (isAttendanceError.value) return "Gagal memuat data";
+
     if (attendanceList.isEmpty) {
-      return isSearching.value ? "Data tidak ditemukan" : "Belum ada data absensi";
+      return isSearchingAttendance.value
+          ? "Data tidak ditemukan"
+          : "Belum ada data absensi";
     }
+
     return "";
   }
-
 
   //cuti
   final RxList<LeaveHistoryModel> leaveList = <LeaveHistoryModel>[].obs;
   final RxBool isLeaveLoading = false.obs;
   final RxBool isLeaveError = false.obs;
-  final RxString leaveSearchQuery = "".obs;
+  final RxBool isSearchingLeave = false.obs;
+
   Timer? _leaveDebounce;
-  final RxBool isLeaveSearchActive = false.obs;
 
   void onLeaveSearchChanged(String value) {
-    leaveSearchQuery.value = value;
-    isLeaveSearchActive.value = value.trim().isNotEmpty;
+    isSearchingLeave.value = value.trim().isNotEmpty;
 
     _leaveDebounce?.cancel();
     _leaveDebounce = Timer(
@@ -96,8 +91,9 @@ class DashboardController extends GetxController {
       isLeaveError.value = false;
 
       final result = await getLeaveHistoryUsecase(search: search);
+
       leaveList.assignAll(result);
-    } catch (e) {
+    } catch (_) {
       leaveList.clear();
       isLeaveError.value = true;
     } finally {
@@ -108,11 +104,16 @@ class DashboardController extends GetxController {
   String get leaveEmptyMessage {
     if (isLeaveLoading.value) return "";
     if (isLeaveError.value) return "Gagal memuat data";
+
     if (leaveList.isEmpty) {
-      return isLeaveSearchActive.value ? "Data tidak ditemukan" : "Belum ada data cuti";
+      return isSearchingLeave.value
+          ? "Data tidak ditemukan"
+          : "Belum ada data cuti";
     }
+
     return "";
   }
+
 
   //modal
   final TextEditingController modalTextController = TextEditingController();
@@ -153,15 +154,14 @@ class DashboardController extends GetxController {
 
   @override
   void onInit() {
-    super.onInit();
     fetchAttendance();
     fetchLeave();
+    super.onInit();
   }
 
   @override
   void onClose() {
     pageController.dispose();
-    modalTextController.dispose();
     _attendanceDebounce?.cancel();
     _leaveDebounce?.cancel();
     super.onClose();

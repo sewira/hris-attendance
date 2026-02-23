@@ -6,14 +6,20 @@ class ProfileItem extends StatelessWidget {
   final String label;
   final String value;
   final bool isIcon;
-  final VoidCallback? onTap; 
+  final VoidCallback? onTap;
+
+  // 🔥 flex bisa diatur dari luar
+  final int labelFlex;
+  final int valueFlex;
 
   const ProfileItem({
     super.key,
     required this.label,
     required this.value,
     this.isIcon = false,
-    this.onTap, 
+    this.onTap,
+    this.labelFlex = 6,   // default tetap 6
+    this.valueFlex = 9,   // default tetap 9
   });
 
   @override
@@ -26,20 +32,19 @@ class ProfileItem extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            flex: 6,
+            flex: labelFlex,
             child: Text(
               label,
               style: const TextStyle(
                 fontFamily: "Inter",
-                fontSize: 17,
+                fontSize: 16,
                 fontWeight: FontWeight.w300,
                 color: AppColor.disablePressed,
               ),
             ),
           ),
-
           Expanded(
-            flex: 6,
+            flex: valueFlex,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -50,17 +55,16 @@ class ProfileItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontFamily: "Inter",
-                      fontSize: 17,
+                      fontSize: 16,
                       color: AppColor.disableBorder,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-
                 if (isIcon) ...[
                   const SizedBox(width: 8),
                   InkWell(
-                    onTap: onTap, 
+                    onTap: onTap,
                     child: const HeroIcon(
                       HeroIcons.pencilSquare,
                       size: 26,

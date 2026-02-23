@@ -1,6 +1,8 @@
 import 'package:hr_attendance/core/utils/extensions.dart';
 
 class LeaveHistoryModel {
+  final String startDate;
+  final String endDate;
   final String leaveDate; 
   final String reason;
   final String hrNote;
@@ -8,6 +10,8 @@ class LeaveHistoryModel {
   final String status;
 
   LeaveHistoryModel({
+    required this.startDate,
+    required this.endDate,
     required this.leaveDate,
     required this.reason,
     required this.hrNote,
@@ -20,6 +24,8 @@ class LeaveHistoryModel {
     final end = (json['end_date'] ?? "-").toString();
 
     return LeaveHistoryModel(
+      startDate: start,
+      endDate: end,
       leaveDate: start.toFormattedLeaveRange(end),
       reason: json['reason'] ?? "-",
       hrNote: (json['hr_note'] == null || json['hr_note'] == "")

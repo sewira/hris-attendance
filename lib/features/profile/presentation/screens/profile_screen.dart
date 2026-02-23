@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:hr_attendance/config/routes/app_routes.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
+import 'package:hr_attendance/core/utils/app_storage.dart';
+import 'package:hr_attendance/core/utils/extensions.dart';
 import 'package:hr_attendance/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:hr_attendance/features/profile/presentation/widgets/profile_widget.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/shared/widgets/button_widget.dart';
-import 'package:hr_attendance/shared/widgets/date_dialog.dart';
 import 'package:hr_attendance/shared/widgets/table_widget.dart';
 
 class ProfileScreen extends GetView<ProfileController> {
@@ -16,7 +16,6 @@ class ProfileScreen extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-
     return DefaultTabController(
       length: 2,
       child: Padding(
@@ -24,6 +23,7 @@ class ProfileScreen extends GetView<ProfileController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// ================= HEADER =================
             Padding(
               padding: const EdgeInsets.only(top: 15),
               child: SizedBox(
@@ -34,35 +34,44 @@ class ProfileScreen extends GetView<ProfileController> {
                   children: [
                     Image.asset(AppAssets.profile),
                     const SizedBox(width: 25),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "Tommy Darvito W",
-                          style: TextStyle(
-                            fontFamily: "Inter",
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      final profile = controller.profile.value;
+                      if (profile == null) return const SizedBox();
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            profile.fullName,
+                            style: const TextStyle(
+                              fontFamily: "Inter",
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          "Mobile",
-                          style: TextStyle(
-                            fontFamily: "Inter",
-                            fontSize: 17,
-                            fontWeight: FontWeight.w300,
+                          const SizedBox(height: 5),
+                          Text(
+                            profile.department,
+                            style: const TextStyle(
+                              fontFamily: "Inter",
+                              fontSize: 17,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             Container(
               padding: const EdgeInsets.all(6),
@@ -80,11 +89,6 @@ class ProfileScreen extends GetView<ProfileController> {
                 dividerColor: Colors.transparent,
                 labelColor: AppColor.netral1,
                 unselectedLabelColor: AppColor.netral1,
-                labelStyle: TextStyle(
-                  fontFamily: "Inter",
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                ),
                 tabs: const [
                   Tab(text: "Data pribadi"),
                   Tab(text: "Data kepegawaian"),
@@ -92,40 +96,42 @@ class ProfileScreen extends GetView<ProfileController> {
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             Expanded(
               child: TabBarView(
                 children: [
                   ListView(
                     children: [
-                      const ProfileItem(
-                        label: "Email",
-                        value: "tommy@gmail.com",
-                      ),
+                      Obx(() {
+                        final profile = controller.profile.value;
+                        if (profile == null) return const SizedBox();
+                        return ProfileItem(
+                          label: "Email",
+                          value: profile.email,
+                        );
+                      }),
                       ProfileItem(
                         label: "Password",
                         value: "********",
                         isIcon: true,
                         onTap: () {
-                          Get.toNamed(
-                            AppRoutes.password,
-                          );
+                          Get.toNamed(AppRoutes.password);
                         },
                       ),
-
                       const ProfileItem(label: "NIP", value: "1234567"),
-
                       const SizedBox(height: 40),
-
                       ButtonLarge(
                         label: "Logout",
                         onPressed: () {
                           Alertdialog.show(
-                            animasi: AppAssets.lottieQuestion, 
-                            message: "Ingin keluar dari akun anda", 
-                            isQuestion: true, 
-                            onConfirm: (){}
+                            animasi: AppAssets.lottieQuestion,
+                            message: "Ingin keluar dari akun anda",
+                            isQuestion: true,
+                            onConfirm: () async {
+                              await AppStorage.clearAll();
+                              Get.offAllNamed(AppRoutes.login);
+                            },
                           );
                         },
                         isEnabled: true,
@@ -134,77 +140,182 @@ class ProfileScreen extends GetView<ProfileController> {
                     ],
                   ),
 
-                  ListView(
-                    children: [
-                      const ProfileItem(
-                        label: "Lama bekerja",
-                        value: "1 Tahun",
-                      ),
-                      const ProfileItem(label: "Divisi", value: "Mobile"),
-                      const ProfileItem(
-                        label: "Banyak cuti diambil",
-                        value: "9",
-                      ),
-                      const ProfileItem(
-                        label: "Sisa cuti tersedia",
-                        value: "4",
-                      ),
+                  /// ================= TAB 2 (FIXED) =================
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                      SizedBox(height: 20),
+                    final profile = controller.profile.value;
+                    if (profile == null) return const SizedBox();
 
-                      // CustomDataTable(
-                      //   showSearch: false,
-                      //   columns: [
-                      //     const DataColumn(label: Text("No")),
+                    return Column(
+                      children: [
+                        ProfileItem(
+                          label: "Lama bekerja",
+                          value: profile.employmentDuration,
+                        ),
+                        ProfileItem(label: "Divisi", value: profile.department),
+                        ProfileItem(
+                          label: "Total Cuti Diambil",
+                          value: profile.totalLeavesTaken.toString(),
+                          labelFlex: 7,
+                          valueFlex: 3,
+                        ),
+                        ProfileItem(
+                          label: "Sisa Cuti",
+                          value: profile.leaveBalance.toString(),
+                          labelFlex: 7,
+                          valueFlex: 3,
+                        ),
 
-                      //     DataColumn(
-                      //       label: Center(
-                      //         child: Row(
-                      //           mainAxisSize: MainAxisSize.min,
-                      //           mainAxisAlignment: MainAxisAlignment.center,
-                      //           children: [
-                      //             const Text("Tanggal"),
-                      //             IconButton(
-                      //               icon: const HeroIcon(
-                      //                 HeroIcons.calendar,
-                      //                 size: 20,
-                      //                 color: AppColor.netral1,
-                      //               ),
-                      //               padding: EdgeInsets.zero,
-                      //               constraints: const BoxConstraints(),
-                      //               onPressed: () async {
-                      //                 await showDateDialog(
-                      //                   context,
-                      //                   controller.filterDateController,
-                      //                 );
-                      //               },
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ),
+                        const SizedBox(height: 20),
 
-                      //     const DataColumn(label: Text("Durasi Kerja")),
-                      //     const DataColumn(label: Text("Clock In")),
-                      //     const DataColumn(label: Text("Clock Out")),
-                      //   ],
-                      //   rows: List.generate(
-                      //     10,
-                      //     (index) => DataRow(
-                      //       cells: [
-                      //         DataCell(Center(child: Text("${index + 1}"))),
-                      //         const DataCell(
-                      //           Center(child: Text("20 Jan 2026")),
-                      //         ),
-                      //         const DataCell(Center(child: Text("8 Jam"))),
-                      //         const DataCell(Center(child: Text("08.00"))),
-                      //         const DataCell(Center(child: Text("17.00"))),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Riwayat absen",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.disable,
+                              ),
+                            ),
+
+                            SizedBox(
+                              width: 160,
+                              height: 35,
+                              child: TextField(
+                                onChanged: controller.onSearchChanged,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppColor.netral2,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: "Search...",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  suffixIcon: const Icon(
+                                    Icons.search,
+                                    size: 18,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                    borderSide: BorderSide(
+                                      color: AppColor.disableBorder,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: Obx(() {
+                            return Stack(
+                              children: [
+                                CustomDataTable(
+                                  columns: const [
+                                    DataColumn(label: Text("No")),
+                                    DataColumn(label: Text("Tanggal")),
+                                    DataColumn(label: Text("Durasi Kerja")),
+                                    DataColumn(label: Text("Clock In")),
+                                    DataColumn(label: Text("Clock Out")),
+                                  ],
+                                  rows: controller.attendanceList
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                        final index = entry.key;
+                                        final data = entry.value;
+
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(
+                                              Center(
+                                                child: Text("${index + 1}"),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Center(child: Text(data.date)),
+                                            ),
+                                            DataCell(
+                                              Center(
+                                                child: Text(data.duration),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Center(
+                                                child: Text(
+                                                  data.clockIn,
+                                                  style: TextStyle(
+                                                    color: data.clockIn
+                                                        .getClockInColor(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Center(
+                                                child: Text(
+                                                  data.clockOut,
+                                                  style: TextStyle(
+                                                    color: data.clockOut
+                                                        .getClockOutColor(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      })
+                                      .toList(),
+                                ),
+
+                                if (controller.isAttendanceLoading.value)
+                                  const Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                  ),
+
+                                if (!controller.isAttendanceLoading.value &&
+                                    controller
+                                        .attendanceEmptyMessage
+                                        .isNotEmpty)
+                                  Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: Center(
+                                        child: Text(
+                                          controller.attendanceEmptyMessage,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColor.netral2,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }),
+                        ),
+                      ],
+                    );
+                  }),
                 ],
               ),
             ),

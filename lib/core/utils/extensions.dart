@@ -119,7 +119,7 @@ extension StringExtension on String {
       final hour = int.parse(parts[0]);
       final minute = int.parse(parts[1]);
 
-      if (hour > 8 || (hour == 8 && minute > 15) && hour < 17) {
+      if (hour > 8 || (hour == 8 && minute > 15)) {
         return AppColor.danger;
       }
 

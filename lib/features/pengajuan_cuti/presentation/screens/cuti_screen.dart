@@ -10,6 +10,7 @@ class CutiScreen extends GetView<CutiController> {
 
   @override
   Widget build(BuildContext context) {
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       child: Form(
@@ -36,6 +37,22 @@ class CutiScreen extends GetView<CutiController> {
               controller: controller.startDateController,
               onTap: () => controller.pickStartDate(context),
             ),
+            Obx(() {
+              if (controller.startDateError.value.isEmpty) {
+                return const SizedBox();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  controller.startDateError.value,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 12,
+                    fontFamily: "Inter",
+                  ),
+                ),
+              );
+            }),
 
             const SizedBox(height: 16),
 
@@ -47,15 +64,14 @@ class CutiScreen extends GetView<CutiController> {
               controller: controller.endDateController,
               onTap: () => controller.pickEndDate(context),
             ),
-
             Obx(() {
-              if (controller.dateError.value.isEmpty) {
+              if (controller.endDateError.value.isEmpty) {
                 return const SizedBox();
               }
               return Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(
-                  controller.dateError.value,
+                  controller.endDateError.value,
                   style: const TextStyle(
                     color: Colors.red,
                     fontSize: 12,
@@ -73,15 +89,47 @@ class CutiScreen extends GetView<CutiController> {
               controller: controller.reasonController,
               type: TextFieldType.normal,
             ),
-
+            Obx(() {
+              if (controller.reasonError.value.isEmpty) {
+                return const SizedBox();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  controller.reasonError.value,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 12,
+                    fontFamily: "Inter",
+                  ),
+                ),
+              );
+            }),
             const SizedBox(height: 16),
 
-            const TextFieldCuti(
-              label: "Sisa Cuti Tersedia",
-              hint: "40",
-              type: TextFieldType.disabled,
-            ),
-
+            Obx(() {
+              return TextFieldCuti(
+                label: "Sisa Cuti Tersedia",
+                hint: controller.leaveBalance.toString(),
+                type: TextFieldType.disabled,
+              );
+            }),
+            Obx(() {
+              if (controller.leaveError.value.isEmpty) {
+                return const SizedBox();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  controller.leaveError.value,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 12,
+                    fontFamily: "Inter",
+                  ),
+                ),
+              );
+            }),
             const SizedBox(height: 24),
 
             ButtonLarge(
