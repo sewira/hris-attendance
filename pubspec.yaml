@@ -18,6 +18,10 @@ dependencies:
   heroicons: ^0.11.0
   lottie: ^3.1.2
   flutter_svg: ^2.0.10
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+  geolocator: ^13.0.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

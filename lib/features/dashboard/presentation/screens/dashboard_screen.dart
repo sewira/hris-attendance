@@ -10,7 +10,9 @@ import 'package:hr_attendance/features/dashboard/presentation/widgets/carousel_w
 import 'package:hr_attendance/features/dashboard/presentation/widgets/status_widget.dart';
 import 'package:hr_attendance/shared/widgets/table_widget.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
+import 'package:hr_attendance/features/dashboard/presentation/widgets/map_confirmation_dialog.dart';
 import 'package:hr_attendance/features/dashboard/presentation/widgets/modal_dialog.dart';
+import 'package:hr_attendance/features/dashboard/presentation/widgets/selfie_confirmation_dialog.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
   final VoidCallback onGoToCuti;
@@ -31,7 +33,24 @@ class DashboardScreen extends GetView<DashboardController> {
         buttonLabel: "Clock in",
         buttonColor: AppColor.succes,
         icon: const HeroIcon(HeroIcons.clock),
-        onPressed: () {},
+        onPressed: () {
+          MapConfirmationDialog.show(
+            onConfirm: (lat, lng) async {
+              Get.back();
+              final isValid = await controller.checkLocation(
+                lat: lat,
+                lng: lng,
+              );
+              if (!isValid) return;
+              SelfieConfirmationDialog.show(
+                onConfirm: (photo) {
+                  Get.back();
+                  controller.clockIn(photo);
+                },
+              );
+            },
+          );
+        },
       ),
       CardDashboard(
         title: "Anda sudah absen hari ini",

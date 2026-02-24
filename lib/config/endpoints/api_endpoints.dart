@@ -8,4 +8,6 @@ abstract class ApiEndpoints {
   static const String profile = 'profile';
   static const String password= 'auth/change-password';
   static const String email= 'auth/profile/email';
+  static const String clockIn = 'attendance/clock-in';
+  static const String checkLocation = 'attendance/check-location';
 }

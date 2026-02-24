@@ -1,18 +1,28 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/features/attendance_history_shared/data/models/attendance_history_model.dart';
 import 'package:hr_attendance/features/attendance_history_shared/domain/usecases/get_attendance_history_month.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
+import 'package:hr_attendance/features/dashboard/domain/usecases/check_location_usecase.dart';
+import 'package:hr_attendance/features/dashboard/domain/usecases/clock_in_usecase.dart';
+import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
+import 'package:hr_attendance/shared/widgets/loading_dialog.dart';
 import '../../domain/usecases/get_leave_history.dart';
 
 class DashboardController extends GetxController {
   final GetAttendanceHistoryMonthUsecase getAttendanceHistoryUsecase;
   final GetLeaveHistoryUsecase getLeaveHistoryUsecase;
+  final ClockInUsecase clockInUsecase;
+  final CheckLocationUsecase checkLocationUsecase;
 
   DashboardController(
     this.getAttendanceHistoryUsecase,
     this.getLeaveHistoryUsecase,
+    this.clockInUsecase,
+    this.checkLocationUsecase,
   );
 
   //carrosel
@@ -114,7 +124,6 @@ class DashboardController extends GetxController {
     return "";
   }
 
-
   //modal
   final TextEditingController modalTextController = TextEditingController();
   final RxBool isModalValid = false.obs;
@@ -151,6 +160,37 @@ class DashboardController extends GetxController {
     modalMessage.value = "";
   }
 
+  Future<bool> checkLocation({required double lat, required double lng}) async {
+    try {
+      LoadingDialog.show();
+      await checkLocationUsecase(lat: lat, lng: lng);
+      LoadingDialog.close();
+      return true;
+    } catch (e) {
+      LoadingDialog.close();
+      final error = e.toString().replaceAll('Exception: ', '');
+      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
+      return false;
+    }
+  }
+
+  Future<void> clockIn(File photo) async {
+    try {
+      LoadingDialog.show();
+      await clockInUsecase(photo);
+      LoadingDialog.close();
+      Alertdialog.show(
+        animasi: AppAssets.lottieSuccess,
+        message: 'Clock in berhasil',
+      );
+      fetchAttendance();
+    } catch (e) {
+      LoadingDialog.close();
+      final error = e.toString().replaceAll('Exception: ', '');
+      // print(error);
+      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
+    }
+  }
 
   @override
   void onInit() {
