@@ -78,7 +78,7 @@ class DashboardScreen extends GetView<DashboardController> {
     ];
 
     return Scaffold(
-      resizeToAvoidBottomInset: false, 
+      resizeToAvoidBottomInset: false,
       body: DefaultTabController(
         length: 2,
         child: Container(
@@ -239,8 +239,26 @@ class DashboardScreen extends GetView<DashboardController> {
                     return DataRow(
                       cells: [
                         DataCell(Center(child: Text("${index + 1}"))),
-                        DataCell(Center(child: Text(item.leaveDate, textAlign: TextAlign.center,))),
-                        DataCell(Center(child: Text(item.reason))),
+                        DataCell(
+                          Center(
+                            child: Text(
+                              item.leaveDate,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          SizedBox(
+                            width: 180, 
+                            child: Text(
+                              item.reason,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              maxLines: null,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                        ),
                         DataCell(Center(child: Text(item.hrNote))),
                         DataCell(Center(child: Text(item.approvedBy))),
                         DataCell(

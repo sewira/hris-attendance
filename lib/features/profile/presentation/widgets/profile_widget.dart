@@ -8,7 +8,6 @@ class ProfileItem extends StatelessWidget {
   final bool isIcon;
   final VoidCallback? onTap;
 
-  // 🔥 flex bisa diatur dari luar
   final int labelFlex;
   final int valueFlex;
 
@@ -18,8 +17,8 @@ class ProfileItem extends StatelessWidget {
     required this.value,
     this.isIcon = false,
     this.onTap,
-    this.labelFlex = 6,   // default tetap 6
-    this.valueFlex = 9,   // default tetap 9
+    this.labelFlex = 4,   
+    this.valueFlex = 6,   
   });
 
   @override
@@ -68,6 +67,7 @@ class ProfileItem extends StatelessWidget {
                     child: const HeroIcon(
                       HeroIcons.pencilSquare,
                       size: 26,
+                      color: AppColor.disableBorder,
                     ),
                   ),
                 ],

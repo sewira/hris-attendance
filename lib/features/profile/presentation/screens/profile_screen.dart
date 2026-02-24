@@ -23,7 +23,6 @@ class ProfileScreen extends GetView<ProfileController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// ================= HEADER =================
             Padding(
               padding: const EdgeInsets.only(top: 15),
               child: SizedBox(
@@ -109,6 +108,12 @@ class ProfileScreen extends GetView<ProfileController> {
                         return ProfileItem(
                           label: "Email",
                           value: profile.email,
+                          labelFlex: 2,
+                          valueFlex: 9,
+                          isIcon: true,
+                          onTap: (){
+                            Get.toNamed(AppRoutes.email);
+                          },
                         );
                       }),
                       ProfileItem(
@@ -140,7 +145,6 @@ class ProfileScreen extends GetView<ProfileController> {
                     ],
                   ),
 
-                  /// ================= TAB 2 (FIXED) =================
                   Obx(() {
                     if (controller.isLoading.value) {
                       return const Center(child: CircularProgressIndicator());

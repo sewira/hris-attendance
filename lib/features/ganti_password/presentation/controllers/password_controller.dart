@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 import 'package:hr_attendance/config/routes/app_routes.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
+import 'package:hr_attendance/features/ganti_password/data/models/password_model.dart';
+import 'package:hr_attendance/features/ganti_password/domain/usecase/ganti_password_usecases.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
+import 'package:hr_attendance/shared/widgets/loading_dialog.dart';
 
 class PasswordController extends GetxController {
-  final latePasswordController = TextEditingController();
+  final GantiPasswordUsecases usecases;
+
+  PasswordController(this.usecases);
+
+  final oldPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
 
+  final oldPasswordError = RxnString();
   final newPasswordError = RxnString();
   final confirmPasswordMessage = RxnString();
+
   final isConfirmValid = false.obs;
   final isFormValid = false.obs;
 
@@ -20,18 +30,26 @@ class PasswordController extends GetxController {
   void onInit() {
     super.onInit();
 
-    latePasswordController.addListener(validateAll);
+    oldPasswordController.addListener(validateAll);
     newPasswordController.addListener(validateAll);
     confirmPasswordController.addListener(validateAll);
   }
 
   void validateAll() {
-    final oldPass = latePasswordController.text;
+    final oldPass = oldPasswordController.text;
     final newPass = newPasswordController.text;
     final confirmPass = confirmPasswordController.text;
 
-    if (oldPass.isNotEmpty && newPass.isNotEmpty && oldPass == newPass) {
-      newPasswordError.value = "password tidak boleh sama dengan yang lama";
+    if (oldPasswordError.value != null) {
+      oldPasswordError.value = null;
+    }
+
+    if (newPass.isEmpty) {
+      newPasswordError.value = null;
+    } else if (newPass.length < 8) {
+      newPasswordError.value = "Password minimal 8 karakter";
+    } else if (oldPass.isNotEmpty && newPass == oldPass) {
+      newPasswordError.value = "Password tidak boleh sama dengan yang lama";
     } else {
       newPasswordError.value = null;
     }
@@ -40,10 +58,10 @@ class PasswordController extends GetxController {
       confirmPasswordMessage.value = null;
       isConfirmValid.value = false;
     } else if (confirmPass == newPass) {
-      confirmPasswordMessage.value = "password sesuai";
+      confirmPasswordMessage.value = "Password sesuai";
       isConfirmValid.value = true;
     } else {
-      confirmPasswordMessage.value = "password tidak sesuai";
+      confirmPasswordMessage.value = "Password tidak sesuai";
       isConfirmValid.value = false;
     }
 
@@ -55,7 +73,11 @@ class PasswordController extends GetxController {
         isConfirmValid.value;
   }
 
-  void submit() {
+  Future<void> submit() async {
+    if (oldPasswordError.value != null) {
+      return;
+    }
+
     if (!isFormValid.value) {
       Alertdialog.show(
         animasi: AppAssets.lottieFailed,
@@ -64,20 +86,46 @@ class PasswordController extends GetxController {
       return;
     }
 
-    Alertdialog.show(
-      animasi: AppAssets.lottieSuccess,
-      message: "Ganti password berhasil",
-      showButton: false,
-      replaceRoute: true,
-      redirectRoute: AppRoutes.login,
-    );
-  }
+    try {
+      LoadingDialog.show();
 
-  @override
-  void onClose() {
-    latePasswordController.dispose();
-    newPasswordController.dispose();
-    confirmPasswordController.dispose();
-    super.onClose();
+      final request = PasswordModel(
+        oldPassword: oldPasswordController.text,
+        newPassword: newPasswordController.text,
+        confirmPassword: confirmPasswordController.text,
+      );
+
+      await usecases(request);
+
+      LoadingDialog.close();
+
+      Alertdialog.show(
+        animasi: AppAssets.lottieSuccess,
+        message: "Ganti password berhasil",
+        showButton: false,
+        replaceRoute: true,
+        redirectRoute: AppRoutes.login,
+      );
+    } on DioException catch (e) {
+      LoadingDialog.close();
+
+      final message = e.response?.data["message"];
+
+      if (message == "password lama salah") {
+        oldPasswordError.value = "Password lama salah";
+      } else {
+        Alertdialog.show(
+          animasi: AppAssets.lottieFailed,
+          message: "Terjadi kesalahan",
+        );
+      }
+    } catch (_) {
+      LoadingDialog.close();
+
+      Alertdialog.show(
+        animasi: AppAssets.lottieFailed,
+        message: "Terjadi kesalahan",
+      );
+    }
   }
 }

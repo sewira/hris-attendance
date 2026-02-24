@@ -115,15 +115,7 @@ class LoginController extends GetxController {
 
       final error = e.toString().replaceAll("Exception: ", "");
 
-      if (error == "BLOCKED_ACCOUNT") {
-        Alertdialog.show(
-          animasi: AppAssets.lottieFailed,
-          message: "Akun anda terblokir silahkan hubungi admin",
-        );
-        return;
-      }
-
-      formError.value = error;
+      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
     }
   }
 
