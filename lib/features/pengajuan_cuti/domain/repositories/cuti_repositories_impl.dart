@@ -7,7 +7,7 @@ class CutiRepositoryImpl implements CutiRepository{
   final CutiRemoteDatasource remoteDatasource;
 
   CutiRepositoryImpl(this.remoteDatasource);
-
+  
   @override
   Future<void> submitCuti(CutiModel request) {
     return remoteDatasource.submitCuti(request);

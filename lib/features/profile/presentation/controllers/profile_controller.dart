@@ -17,11 +17,9 @@ class ProfileController extends GetxController {
     this.getAllAttendanceUsecase,
   );
 
-  // ================= PROFILE =================
   final RxBool isLoading = false.obs;
   final Rxn<ProfileModel> profile = Rxn<ProfileModel>();
 
-  // ================= ATTENDANCE =================
   final RxList<AttendanceModel> attendanceList = <AttendanceModel>[].obs;
   final RxBool isAttendanceLoading = false.obs;
   final RxBool isAttendanceError = false.obs;
@@ -44,7 +42,6 @@ class ProfileController extends GetxController {
     super.onClose();
   }
 
-  // ================= FETCH PROFILE =================
   Future<void> fetchProfile() async {
     try {
       isLoading.value = true;
@@ -58,7 +55,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // ================= FETCH ALL ATTENDANCE =================
   Future<void> fetchAllAttendance({String? search}) async {
     try {
       isAttendanceLoading.value = true;
@@ -74,7 +70,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // ================= SEARCH =================
   void onSearchChanged(String value) {
     attendanceSearchQuery.value = value;
     isSearching.value = value.isNotEmpty;
@@ -86,7 +81,6 @@ class ProfileController extends GetxController {
     );
   }
 
-  // ================= EMPTY MESSAGE HANDLER =================
   String get attendanceEmptyMessage {
     if (isAttendanceLoading.value) return "";
     if (isAttendanceError.value) return "Gagal memuat data";

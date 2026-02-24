@@ -23,9 +23,7 @@ class PasswordScreen extends GetView<PasswordController> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () {
-                        {Get.back();}
-                      },
+                      onPressed: Get.back,
                       icon: const Icon(Icons.arrow_back_ios_new, size: 22),
                       color: AppColor.disableBorder,
                     ),
@@ -33,7 +31,6 @@ class PasswordScreen extends GetView<PasswordController> {
                     const Text(
                       "Ganti Password",
                       style: TextStyle(
-                        fontFamily: "Inter",
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColor.disableBorder,
@@ -47,9 +44,22 @@ class PasswordScreen extends GetView<PasswordController> {
                 TextFieldCuti(
                   label: "Password Lama",
                   hint: "Input Password",
-                  controller: controller.latePasswordController,
+                  controller: controller.oldPasswordController,
                   type: TextFieldType.normal,
                 ),
+
+                Obx(() {
+                  final err = controller.oldPasswordError.value;
+                  if (err == null) return const SizedBox();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      err,
+                      style: const TextStyle(color: AppColor.danger),
+                    ),
+                  );
+                }),
+
                 const SizedBox(height: 16),
 
                 TextFieldCuti(
@@ -60,13 +70,12 @@ class PasswordScreen extends GetView<PasswordController> {
                 ),
 
                 Obx(() {
-                  if (controller.newPasswordError.value == null) {
-                    return const SizedBox();
-                  }
+                  final err = controller.newPasswordError.value;
+                  if (err == null) return const SizedBox();
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      controller.newPasswordError.value!,
+                      err,
                       style: const TextStyle(color: AppColor.danger),
                     ),
                   );
@@ -100,12 +109,12 @@ class PasswordScreen extends GetView<PasswordController> {
 
                 const SizedBox(height: 24),
 
-                ButtonLarge(
-                  label: "Kirim",
-                  onPressed: controller.submit,
-                  isEnabled: true,
-                  colorButton: AppColor.info,
-                ),
+                Obx(() => ButtonLarge(
+                      label: "Kirim",
+                      onPressed: controller.submit,
+                      isEnabled: controller.isFormValid.value,
+                      colorButton: AppColor.info,
+                    )),
               ],
             ),
           ),
