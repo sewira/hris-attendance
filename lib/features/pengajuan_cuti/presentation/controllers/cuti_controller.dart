@@ -14,6 +14,7 @@ class CutiController extends GetxController {
   final RxString dateError = "".obs;
   final DateFormat formatter = DateFormat("dd/MM/yyyy");
 
+
   Future<void> pickStartDate(BuildContext context) async {
     await showDateDialog(context, startDateController);
     validateDate();
