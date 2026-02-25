@@ -1,4 +1,6 @@
 import 'package:alice/alice.dart';
+import 'package:alice/model/alice_configuration.dart';
+import 'package:alice_dio/alice_dio_adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../../config/endpoints/api_endpoints.dart';
@@ -10,8 +12,10 @@ class DioClient {
   late Dio dio;
 
   static final Alice alice = Alice(
-    showNotification: false,
-    showInspectorOnShake: true,
+    configuration: AliceConfiguration(
+      showNotification: false,
+      showInspectorOnShake: true,
+    ),
   );
 
   DioClient._() {
@@ -71,7 +75,9 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.add(alice.getDioInterceptor());
+    final dioAdapter = AliceDioAdapter();
+    alice.addAdapter(dioAdapter);
+    dio.interceptors.add(dioAdapter);
   }
 
   static DioClient get instance {
