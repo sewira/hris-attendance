@@ -36,6 +36,9 @@ class _SelfieConfirmationDialogState extends State<SelfieConfirmationDialog> {
     final photo = await picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.front,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 70,
     );
     if (photo != null) {
       setState(() {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "991757399873",
+    "project_id": "hris-35eb0",
+    "storage_bucket": "hris-35eb0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991757399873:android:7f96b4ad08c92153acd3c0",
+        "android_client_info": {
+          "package_name": "com.example.hr_attendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsUX8QOtujMFxuBEM9PcpM7Umf7-GPl7s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
