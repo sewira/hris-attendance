@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'config/bindings/global_binding.dart';
 import 'config/routes/app_routes.dart';
 import 'config/theme/app_theme.dart';
+import 'core/network/dio_client.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -12,6 +13,7 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       title: 'HR Attendance',
       debugShowCheckedModeBanner: false,
+      navigatorKey: DioClient.alice.getNavigatorKey(),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,

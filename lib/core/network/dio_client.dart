@@ -1,3 +1,4 @@
+import 'package:alice/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../../config/endpoints/api_endpoints.dart';
@@ -7,6 +8,11 @@ import '../../config/routes/app_routes.dart';
 class DioClient {
   static DioClient? _instance;
   late Dio dio;
+
+  static final Alice alice = Alice(
+    showNotification: false,
+    showInspectorOnShake: true,
+  );
 
   DioClient._() {
     dio = Dio(
@@ -65,15 +71,7 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
-      ),
-    );
+    dio.interceptors.add(alice.getDioInterceptor());
   }
 
   static DioClient get instance {
