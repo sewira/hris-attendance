@@ -36,12 +36,21 @@ class DashboardScreen extends GetView<DashboardController> {
         onPressed: () {
           MapConfirmationDialog.show(
             onConfirm: (lat, lng) async {
+              final result = await controller.checkLocation(lat: lat, lng: lng);
+
+              if (result == null) return;
+
+              if (!result.isNear) {
+                Alertdialog.show(
+                  animasi: AppAssets.lottieFailed,
+                  message:
+                      "Anda berada ${result.distanceMeters.toStringAsFixed(0)}m dari kantor (max ${result.maxDistanceMeters.toStringAsFixed(0)}m)",
+                );
+                return;
+              }
+
               Get.back();
-              final isValid = await controller.checkLocation(
-                lat: lat,
-                lng: lng,
-              );
-              if (!isValid) return;
+
               SelfieConfirmationDialog.show(
                 onConfirm: (photo) {
                   Get.back();
@@ -268,7 +277,7 @@ class DashboardScreen extends GetView<DashboardController> {
                         ),
                         DataCell(
                           SizedBox(
-                            width: 180, 
+                            width: 180,
                             child: Text(
                               item.reason,
                               textAlign: TextAlign.center,

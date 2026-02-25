@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:hr_attendance/features/dashboard/data/datasources/dashboard_remote_datasource.dart.dart';
+import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 
@@ -28,7 +29,10 @@ class DashboardRepositoryImpl implements DashboardRepository {
   }
 
   @override
-  Future<void> checkLocation({required double lat, required double lng}) {
+  Future<CheckLocationResponse> checkLocation({
+    required double lat,
+    required double lng,
+  }) {
     return remoteDatasource.checkLocation(lat: lat, lng: lng);
   }
 

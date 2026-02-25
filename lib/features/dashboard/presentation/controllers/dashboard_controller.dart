@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
 import 'package:hr_attendance/features/attendance_history_shared/data/models/attendance_history_model.dart';
 import 'package:hr_attendance/features/attendance_history_shared/domain/usecases/get_attendance_history_month.dart';
+import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/check_location_usecase.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/clock_in_usecase.dart';
@@ -160,17 +161,22 @@ class DashboardController extends GetxController {
     modalMessage.value = "";
   }
 
-  Future<bool> checkLocation({required double lat, required double lng}) async {
+  Future<CheckLocationResponse?> checkLocation({
+    required double lat,
+    required double lng,
+  }) async {
     try {
       LoadingDialog.show();
-      await checkLocationUsecase(lat: lat, lng: lng);
+
+      final result = await checkLocationUsecase(lat: lat, lng: lng);
+
       LoadingDialog.close();
-      return true;
+      return result;
     } catch (e) {
       LoadingDialog.close();
       final error = e.toString().replaceAll('Exception: ', '');
       Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
-      return false;
+      return null;
     }
   }
 

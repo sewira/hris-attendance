@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:hr_attendance/config/location/office_location.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
+import 'package:hr_attendance/features/dashboard/presentation/controllers/dashboard_controller.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapConfirmationDialog extends StatefulWidget {
@@ -14,10 +14,8 @@ class MapConfirmationDialog extends StatefulWidget {
   static Future<void> show({void Function(double lat, double lng)? onConfirm}) {
     return Get.dialog(
       Material(
-        color: Colors.black.withValues(alpha: 0.2),
-        child: Center(
-          child: MapConfirmationDialog(onConfirm: onConfirm),
-        ),
+        color: Colors.black.withOpacity(0.2),
+        child: Center(child: MapConfirmationDialog(onConfirm: onConfirm)),
       ),
       barrierDismissible: false,
     );
@@ -28,23 +26,25 @@ class MapConfirmationDialog extends StatefulWidget {
 }
 
 class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
+  final controller = Get.find<DashboardController>();
+
   Position? _currentPosition;
   bool _isLoading = true;
   String? _errorMessage;
-  double? _distanceToOffice;
 
-  static const _officeLatLng = LatLng(
-    OfficeLocation.latitude,
-    OfficeLocation.longitude,
-  );
+  double? _officeLat;
+  double? _officeLng;
+  double? _radius;
+  double? _distance;
+  bool _isNear = false;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _initLocation();
   }
 
-  Future<void> _getCurrentLocation() async {
+  Future<void> _initLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -56,6 +56,7 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
@@ -70,7 +71,7 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
       if (permission == LocationPermission.deniedForever) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Izin lokasi ditolak secara permanen';
+          _errorMessage = 'Izin lokasi ditolak permanen';
         });
         return;
       }
@@ -81,29 +82,35 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
         ),
       );
 
-      final distance = Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        OfficeLocation.latitude,
-        OfficeLocation.longitude,
+      final result = await controller.checkLocation(
+        lat: position.latitude,
+        lng: position.longitude,
       );
+
+      if (result == null) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Gagal validasi lokasi';
+        });
+        return;
+      }
 
       setState(() {
         _currentPosition = position;
-        _distanceToOffice = distance;
+        _officeLat = result.officeLat;
+        _officeLng = result.officeLng;
+        _radius = result.maxDistanceMeters;
+        _distance = result.distanceMeters;
+        _isNear = result.isNear;
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
       setState(() {
         _isLoading = false;
         _errorMessage = 'Gagal mendapatkan lokasi';
       });
     }
   }
-
-  bool get _isWithinGeofence =>
-      _distanceToOffice != null &&
-      _distanceToOffice! <= OfficeLocation.radiusInMeters;
 
   @override
   Widget build(BuildContext context) {
@@ -112,65 +119,48 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
       height: MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
         color: AppColor.netral1,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          // Header
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
             color: AppColor.primary,
             child: const Text(
-              'Konfirmasi Lokasi',
-              textAlign: TextAlign.center,
+              'Konfirmasi lokasi saat ini',
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
                 color: AppColor.netral1,
               ),
             ),
           ),
 
-          // Map area
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            _errorMessage!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppColor.danger,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      )
-                    : _buildMap(),
+                ? Center(child: Text(_errorMessage!))
+                : _buildMap(),
           ),
 
-          // Status text
           if (!_isLoading && _errorMessage == null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Text(
-                _isWithinGeofence
+                _isNear
                     ? 'Anda berada di area kantor'
-                    : 'Anda di luar area kantor (${_distanceToOffice?.toStringAsFixed(0)} m)',
+                    : 'Anda di luar area kantor (${_distance?.toStringAsFixed(0)} m)',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: _isWithinGeofence ? AppColor.succes : AppColor.danger,
+                  color: _isNear ? AppColor.succes : AppColor.danger,
                 ),
               ),
             ),
 
-          // Buttons
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
             child: Row(
@@ -192,11 +182,13 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _isWithinGeofence
-                        ? () => widget.onConfirm?.call(
+                    onPressed: (_isNear && _currentPosition != null)
+                        ? () {
+                            widget.onConfirm?.call(
                               _currentPosition!.latitude,
                               _currentPosition!.longitude,
-                            )
+                            );
+                          }
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColor.succes,
@@ -225,11 +217,10 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
       _currentPosition!.longitude,
     );
 
+    final officeLatLng = LatLng(_officeLat!, _officeLng!);
+
     return FlutterMap(
-      options: MapOptions(
-        initialCenter: _officeLatLng,
-        initialZoom: 17,
-      ),
+      options: MapOptions(initialCenter: userLatLng, initialZoom: 15),
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -238,10 +229,10 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
         CircleLayer(
           circles: [
             CircleMarker(
-              point: _officeLatLng,
-              radius: OfficeLocation.radiusInMeters,
+              point: officeLatLng,
+              radius: _radius!,
               useRadiusInMeter: true,
-              color: AppColor.succes.withValues(alpha: 0.2),
+              color: AppColor.succes.withOpacity(0.2),
               borderColor: AppColor.succes,
               borderStrokeWidth: 2,
             ),
@@ -253,11 +244,7 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
               point: userLatLng,
               width: 40,
               height: 40,
-              child: const Icon(
-                Icons.location_on,
-                color: Colors.red,
-                size: 40,
-              ),
+              child: const Icon(Icons.location_on, color: Colors.red, size: 40),
             ),
           ],
         ),

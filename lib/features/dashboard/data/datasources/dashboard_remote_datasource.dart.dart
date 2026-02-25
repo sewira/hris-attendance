@@ -3,13 +3,15 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:hr_attendance/core/network/dio_client.dart';
 import 'package:hr_attendance/config/endpoints/api_endpoints.dart';
+import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 
 class DashboardRemoteDatasource {
 
-  Future<void> checkLocation({
+  Future<CheckLocationResponse> checkLocation({
     required double lat,
     required double lng,
   }) async {
+
     final response = await DioClient.instance.dio.get(
       ApiEndpoints.checkLocation,
       queryParameters: {
@@ -23,6 +25,8 @@ class DashboardRemoteDatasource {
           response.data['message']?.toString() ?? 'Lokasi tidak valid';
       throw Exception(message);
     }
+
+    return CheckLocationResponse.fromJson(response.data);
   }
 
   Future<void> clockIn(File photo) async {

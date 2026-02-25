@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 
 abstract class DashboardRepository {
@@ -7,11 +8,12 @@ abstract class DashboardRepository {
   //   String? search,
   // });
 
-  Future<List<LeaveHistoryModel>> getLeaveHistory({
-    String? search,
-  });
+  Future<List<LeaveHistoryModel>> getLeaveHistory({String? search});
 
-  Future<void> checkLocation({required double lat, required double lng});
+  Future<CheckLocationResponse> checkLocation({
+    required double lat,
+    required double lng,
+  });
 
   Future<void> clockIn(File photo);
 }
