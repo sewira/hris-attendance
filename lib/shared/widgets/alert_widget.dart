@@ -36,26 +36,33 @@ class AlertDialogCustom extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
-      height: height,
+      constraints: BoxConstraints(maxHeight: height),
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: AppColor.netral1,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Lottie.asset(lottie, width: 97, height: 97),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: Text(
-              description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: "Inter",
-                fontSize: 20,
-                color: AppColor.netral2,
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: SingleChildScrollView(
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: "Inter",
+                    fontSize: 20,
+                    color: AppColor.netral2,
+                  ),
+                ),
               ),
             ),
           ),
