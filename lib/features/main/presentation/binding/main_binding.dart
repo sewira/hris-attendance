@@ -7,6 +7,7 @@ import 'package:hr_attendance/features/dashboard/domain/repositories/dashboard_r
 import 'package:hr_attendance/features/dashboard/domain/repositories/dashboard_repository_impl.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/check_location_usecase.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/clock_in_usecase.dart';
+import 'package:hr_attendance/features/dashboard/domain/usecases/clock_out_usecase.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/get_leave_history.dart';
 import 'package:hr_attendance/features/dashboard/presentation/controllers/dashboard_controller.dart';
 import 'package:hr_attendance/features/main/presentation/controller/main_controller.dart';
@@ -46,18 +47,16 @@ class MainBinding extends Bindings {
     Get.lazyPut<GetLeaveHistoryUsecase>(
       () => GetLeaveHistoryUsecase(Get.find()),
     );
-    Get.lazyPut<ClockInUsecase>(
-      () => ClockInUsecase(Get.find()),
-    );
-    Get.lazyPut<CheckLocationUsecase>(
-      () => CheckLocationUsecase(Get.find()),
-    );
+    Get.lazyPut<ClockInUsecase>(() => ClockInUsecase(Get.find()));
+    Get.lazyPut<CheckLocationUsecase>(() => CheckLocationUsecase(Get.find()));
+    Get.put<ClockOutUsecase>(ClockOutUsecase(Get.find()));
     Get.lazyPut<DashboardController>(
       () => DashboardController(
         Get.find<GetAttendanceHistoryMonthUsecase>(),
         Get.find<GetLeaveHistoryUsecase>(),
         Get.find<ClockInUsecase>(),
         Get.find<CheckLocationUsecase>(),
+        Get.find<ClockOutUsecase>(),
       ),
       fenix: true,
     );

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:hr_attendance/features/dashboard/data/datasources/dashboard_remote_datasource.dart.dart';
+import 'package:hr_attendance/features/dashboard/data/models/attendance_today_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 import '../../domain/repositories/dashboard_repository.dart';
@@ -37,7 +38,12 @@ class DashboardRepositoryImpl implements DashboardRepository {
   }
 
   @override
-  Future<void> clockIn(File photo) {
+  Future<AttendanceTodayModel> clockIn(File photo) {
     return remoteDatasource.clockIn(photo);
+  }
+
+  @override
+  Future<void> clockOut({String? note}) {
+    return remoteDatasource.clockOut(note: note);
   }
 }
