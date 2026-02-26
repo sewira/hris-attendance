@@ -22,82 +22,112 @@ class DashboardScreen extends GetView<DashboardController> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [
-      CardDashboard(
-        title: "Anda belum absen hari ini!",
-        subtitle: "Absensi anda",
-        headerColor: AppColor.danger,
-        items: [
-          CardInfoItem(title: "Jam masuk", value: "-"),
-          CardInfoItem(title: "Jam pulang", value: "-"),
-        ],
-        buttonLabel: "Clock in",
-        buttonColor: AppColor.succes,
-        icon: const HeroIcon(HeroIcons.clock),
-        onPressed: () {
-          MapConfirmationDialog.show(
-            onConfirm: (lat, lng) async {
-              final result = await controller.checkLocation(lat: lat, lng: lng);
+      Obx(
+        () => !controller.isClockInDone.value
+            ? CardDashboard(
+                title: "Anda belum absen hari ini!",
+                subtitle: "Absensi anda",
+                headerColor: AppColor.danger,
+                items: [
+                  CardInfoItem(title: "Jam masuk", value: "-"),
+                  CardInfoItem(title: "Jam pulang", value: "-"),
+                ],
+                buttonLabel: "Clock in",
+                buttonColor: AppColor.succes,
+                icon: const HeroIcon(HeroIcons.clock),
+                onPressed: () {
+                  MapConfirmationDialog.show(
+                    onConfirm: (lat, lng) async {
+                      final result = await controller.checkLocation(
+                        lat: lat,
+                        lng: lng,
+                      );
+                      if (result == null) return;
 
-              if (result == null) return;
+                      if (!result.isNear) {
+                        Alertdialog.show(
+                          animasi: AppAssets.lottieFailed,
+                          message:
+                              "Anda berada ${result.distanceMeters.toStringAsFixed(0)}m dari kantor (max ${result.maxDistanceMeters.toStringAsFixed(0)}m)",
+                        );
+                        return;
+                      }
 
-              if (!result.isNear) {
-                Alertdialog.show(
-                  animasi: AppAssets.lottieFailed,
-                  message:
-                      "Anda berada ${result.distanceMeters.toStringAsFixed(0)}m dari kantor (max ${result.maxDistanceMeters.toStringAsFixed(0)}m)",
-                );
-                return;
-              }
+                      Get.back();
 
-              Get.back();
-
-              SelfieConfirmationDialog.show(
-                onConfirm: (photo) {
-                  Get.back();
-                  controller.clockIn(photo);
+                      SelfieConfirmationDialog.show(
+                        onConfirm: (photo) {
+                          Get.back();
+                          controller.clockIn(photo);
+                        },
+                      );
+                    },
+                  );
                 },
-              );
-            },
-          );
-        },
-      ),
-      CardDashboard(
-        title: "Anda sudah absen hari ini",
-        subtitle: "Absensi anda",
-        headerColor: AppColor.primary,
-        items: [
-          CardInfoItem(title: "Jam masuk", value: "07.30"),
-          CardInfoItem(title: "Jam pulang", value: "-"),
-        ],
-        buttonLabel: "Clock out",
-        buttonColor: AppColor.danger,
-        icon: const HeroIcon(HeroIcons.clock),
-        onPressed: () {
-          Alertdialog.show(
-            animasi: AppAssets.lottieQuestion,
-            isQuestion: true,
-            message: "Belum masuk jam pulang, ingin lanjut Clock out?",
-            onConfirm: () {
-              Get.back();
-              ModalDialog.show(
-                maxLength: 50,
-                onSubmit: (text) {
-                  Get.back();
-                  controller.clockOut(note: text);
+              )
+            : !controller.isClockOutDone.value
+            ? CardDashboard(
+                title: "Anda sudah absen hari ini",
+                subtitle: "Absensi anda",
+                headerColor: AppColor.primary,
+                items: [
+                  CardInfoItem(
+                    title: "Jam masuk",
+                    value: controller.todayClockIn.value,
+                  ),
+                  CardInfoItem(title: "Jam pulang", value: "-"),
+                ],
+                buttonLabel: "Clock out",
+                buttonColor: AppColor.danger,
+                icon: const HeroIcon(HeroIcons.clock),
+                onPressed: () {
+                  final now = TimeOfDay.now();
+                  if (now.hour < 17) {
+                    Alertdialog.show(
+                      animasi: AppAssets.lottieQuestion,
+                      message:
+                          "Belum masuk jam pulang, ingin lanjut Clock Out?",
+                      isQuestion: true,
+                      onConfirm: () {
+                        Get.back();
+                        ModalDialog.show(
+                          maxLength: 50,
+                          onSubmit: (text) {
+                            Get.back();
+                            controller.clockOut(note: text);
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    Alertdialog.show(
+                      animasi: AppAssets.lottieQuestion,
+                      isQuestion: true,
+                      message: "Yakin ingin clock out?",
+                      onConfirm: () {
+                        Get.back();
+                        controller.clockOut();
+                      },
+                    );
+                  }
                 },
-              );
-            },
-          );
-        },
+              )
+            : CardDashboard(
+                title: "Absensi anda sudah lengkap!",
+                headerColor: AppColor.succes,
+                items: [
+                  CardInfoItem(
+                    title: "Jam masuk",
+                    value: controller.todayClockIn.value,
+                  ),
+                  CardInfoItem(
+                    title: "Jam pulang",
+                    value: controller.todayClockOut.value,
+                  ),
+                ],
+              ),
       ),
-      CardDashboard(
-        title: "Absensi anda sudah lengkap!",
-        headerColor: AppColor.succes,
-        items: [
-          CardInfoItem(title: "Jam masuk", value: "07.30"),
-          CardInfoItem(title: "Jam pulang", value: "16.00"),
-        ],
-      ),
+
       CardDashboard(
         title: "Info cuti anda",
         headerColor: AppColor.info,

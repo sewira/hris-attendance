@@ -3,21 +3,17 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:hr_attendance/core/network/dio_client.dart';
 import 'package:hr_attendance/config/endpoints/api_endpoints.dart';
+import 'package:hr_attendance/features/dashboard/data/models/attendance_today_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 
 class DashboardRemoteDatasource {
-
   Future<CheckLocationResponse> checkLocation({
     required double lat,
     required double lng,
   }) async {
-
     final response = await DioClient.instance.dio.get(
       ApiEndpoints.checkLocation,
-      queryParameters: {
-        'lat': lat,
-        'lng': lng,
-      },
+      queryParameters: {'lat': lat, 'lng': lng},
     );
 
     if (response.statusCode != 200) {
@@ -29,7 +25,7 @@ class DashboardRemoteDatasource {
     return CheckLocationResponse.fromJson(response.data);
   }
 
-  Future<void> clockIn(File photo) async {
+  Future<AttendanceTodayModel> clockIn(File photo) async {
     final formData = FormData.fromMap({
       'photo': await MultipartFile.fromFile(
         photo.path,
@@ -40,21 +36,27 @@ class DashboardRemoteDatasource {
     final response = await DioClient.instance.dio.post(
       ApiEndpoints.clockIn,
       data: formData,
-      options: Options(
-        contentType: 'multipart/form-data',
-      ),
+      options: Options(contentType: 'multipart/form-data'),
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       final message = response.data['message']?.toString() ?? 'Clock in gagal';
       throw Exception(message);
     }
+
+    return AttendanceTodayModel.fromJson(response.data);
+  }
+
+  String formatTime(String? isoString) {
+    if (isoString == null) return "-";
+    final dt = DateTime.parse(isoString);
+    return "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
   }
 
   Future<void> clockOut({String? note}) async {
     final response = await DioClient.instance.dio.post(
       ApiEndpoints.clockOut,
-      data: {if (note != null && note.isNotEmpty) 'note': note},
+      data: {if (note != null && note.isNotEmpty) "note": note},
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {

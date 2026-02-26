@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:hr_attendance/features/dashboard/data/models/attendance_today_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 
@@ -15,6 +15,7 @@ abstract class DashboardRepository {
     required double lng,
   });
 
-  Future<void> clockIn(File photo);
+  Future<AttendanceTodayModel> clockIn(File photo);
+
   Future<void> clockOut({String? note});
 }

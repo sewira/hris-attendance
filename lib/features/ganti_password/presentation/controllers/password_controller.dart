@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:hr_attendance/config/routes/app_routes.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
+import 'package:hr_attendance/core/utils/app_storage.dart';
 import 'package:hr_attendance/features/ganti_password/data/models/password_model.dart';
 import 'package:hr_attendance/features/ganti_password/domain/usecase/ganti_password_usecases.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
@@ -98,6 +99,8 @@ class PasswordController extends GetxController {
       await usecases(request);
 
       LoadingDialog.close();
+
+      await AppStorage.logout();
 
       Alertdialog.show(
         animasi: AppAssets.lottieSuccess,

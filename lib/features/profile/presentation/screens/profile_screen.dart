@@ -111,7 +111,7 @@ class ProfileScreen extends GetView<ProfileController> {
                           labelFlex: 2,
                           valueFlex: 9,
                           isIcon: true,
-                          onTap: (){
+                          onTap: () {
                             Get.toNamed(AppRoutes.email);
                           },
                         );
@@ -134,7 +134,7 @@ class ProfileScreen extends GetView<ProfileController> {
                             message: "Ingin keluar dari akun anda",
                             isQuestion: true,
                             onConfirm: () async {
-                              await AppStorage.clearAll();
+                              await AppStorage.logout();
                               Get.offAllNamed(AppRoutes.login);
                             },
                           );

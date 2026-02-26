@@ -47,15 +47,9 @@ class MainBinding extends Bindings {
     Get.lazyPut<GetLeaveHistoryUsecase>(
       () => GetLeaveHistoryUsecase(Get.find()),
     );
-    Get.lazyPut<ClockInUsecase>(
-      () => ClockInUsecase(Get.find()),
-    );
-    Get.lazyPut<CheckLocationUsecase>(
-      () => CheckLocationUsecase(Get.find()),
-    );
-    Get.lazyPut<ClockOutUsecase>(
-      () => ClockOutUsecase(Get.find()),
-    );
+    Get.lazyPut<ClockInUsecase>(() => ClockInUsecase(Get.find()));
+    Get.lazyPut<CheckLocationUsecase>(() => CheckLocationUsecase(Get.find()));
+    Get.put<ClockOutUsecase>(ClockOutUsecase(Get.find()));
     Get.lazyPut<DashboardController>(
       () => DashboardController(
         Get.find<GetAttendanceHistoryMonthUsecase>(),
@@ -63,6 +57,7 @@ class MainBinding extends Bindings {
         Get.find<ClockInUsecase>(),
         Get.find<ClockOutUsecase>(),
         Get.find<CheckLocationUsecase>(),
+        Get.find<ClockOutUsecase>(),
       ),
       fenix: true,
     );

@@ -220,7 +220,7 @@ class _MapConfirmationDialogState extends State<MapConfirmationDialog> {
     final officeLatLng = LatLng(_officeLat!, _officeLng!);
 
     return FlutterMap(
-      options: MapOptions(initialCenter: userLatLng, initialZoom: 15),
+      options: MapOptions(initialCenter: userLatLng, initialZoom: 16),
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
