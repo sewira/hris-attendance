@@ -79,7 +79,13 @@ class DashboardScreen extends GetView<DashboardController> {
             message: "Belum masuk jam pulang, ingin lanjut Clock out?",
             onConfirm: () {
               Get.back();
-              ModalDialog.show(maxLength: 50, onSubmit: (text) {});
+              ModalDialog.show(
+                maxLength: 50,
+                onSubmit: (text) {
+                  Get.back();
+                  controller.clockOut(note: text);
+                },
+              );
             },
           );
         },

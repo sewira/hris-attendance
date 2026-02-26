@@ -9,6 +9,7 @@ import 'package:hr_attendance/features/dashboard/data/models/check_location_mode
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/check_location_usecase.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/clock_in_usecase.dart';
+import 'package:hr_attendance/features/dashboard/domain/usecases/clock_out_usecase.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/shared/widgets/loading_dialog.dart';
 import '../../domain/usecases/get_leave_history.dart';
@@ -17,12 +18,14 @@ class DashboardController extends GetxController {
   final GetAttendanceHistoryMonthUsecase getAttendanceHistoryUsecase;
   final GetLeaveHistoryUsecase getLeaveHistoryUsecase;
   final ClockInUsecase clockInUsecase;
+  final ClockOutUsecase clockOutUsecase;
   final CheckLocationUsecase checkLocationUsecase;
 
   DashboardController(
     this.getAttendanceHistoryUsecase,
     this.getLeaveHistoryUsecase,
     this.clockInUsecase,
+    this.clockOutUsecase,
     this.checkLocationUsecase,
   );
 
@@ -194,6 +197,23 @@ class DashboardController extends GetxController {
       LoadingDialog.close();
       final error = e.toString().replaceAll('Exception: ', '');
       // print(error);
+      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
+    }
+  }
+
+  Future<void> clockOut({String? note}) async {
+    try {
+      LoadingDialog.show();
+      await clockOutUsecase(note: note);
+      LoadingDialog.close();
+      Alertdialog.show(
+        animasi: AppAssets.lottieSuccess,
+        message: 'Clock out berhasil',
+      );
+      fetchAttendance();
+    } catch (e) {
+      LoadingDialog.close();
+      final error = e.toString().replaceAll('Exception: ', '');
       Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
     }
   }

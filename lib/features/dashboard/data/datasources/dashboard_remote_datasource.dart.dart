@@ -50,7 +50,19 @@ class DashboardRemoteDatasource {
       throw Exception(message);
     }
   }
-  
+
+  Future<void> clockOut({String? note}) async {
+    final response = await DioClient.instance.dio.post(
+      ApiEndpoints.clockOut,
+      data: {if (note != null && note.isNotEmpty) 'note': note},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final message = response.data['message']?.toString() ?? 'Clock out gagal';
+      throw Exception(message);
+    }
+  }
+
   // Future<List<dynamic>> getAttendanceHistory({
   //   String? startDate,
   //   String? endDate,

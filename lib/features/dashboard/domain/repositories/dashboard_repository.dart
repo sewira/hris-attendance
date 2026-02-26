@@ -16,4 +16,5 @@ abstract class DashboardRepository {
   });
 
   Future<void> clockIn(File photo);
+  Future<void> clockOut({String? note});
 }

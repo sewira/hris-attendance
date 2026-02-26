@@ -40,4 +40,9 @@ class DashboardRepositoryImpl implements DashboardRepository {
   Future<void> clockIn(File photo) {
     return remoteDatasource.clockIn(photo);
   }
+
+  @override
+  Future<void> clockOut({String? note}) {
+    return remoteDatasource.clockOut(note: note);
+  }
 }
