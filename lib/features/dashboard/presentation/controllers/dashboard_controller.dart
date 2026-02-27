@@ -37,52 +37,17 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
   //carrosel
   late PageController pageController;
   final RxInt currentPage = 0.obs;
+  void onPageChanged(int index) => currentPage.value = index;
 
-  void onPageChanged(int index) {
-    currentPage.value = index;
-  }
-
-  //state card
+  //state card (hari ini)
   final RxString todayClockIn = "-".obs;
   final RxString todayClockOut = "-".obs;
   final RxBool isClockInDone = false.obs;
   final RxBool isClockOutDone = false.obs;
 
-  void syncTodayAttendanceFromHistory() {
-    final now = DateTime.now();
-
-    try {
-      final todayData = attendanceList.firstWhere((e) {
-        try {
-          final apiDate = DateTime.parse(e.rawDate);
-          return apiDate.year == now.year &&
-              apiDate.month == now.month &&
-              apiDate.day == now.day;
-        } catch (_) {
-          return false;
-        }
-      });
-
-      todayClockIn.value = todayData.clockIn.trim().isEmpty
-          ? "-"
-          : todayData.clockIn;
-
-      todayClockOut.value = todayData.clockOut.trim().isEmpty
-          ? "-"
-          : todayData.clockOut;
-
-      isClockInDone.value = todayClockIn.value != "-";
-      isClockOutDone.value = todayClockOut.value != "-";
-    } catch (_) {
-      todayClockIn.value = "-";
-      todayClockOut.value = "-";
-      isClockInDone.value = false;
-      isClockOutDone.value = false;
-    }
-  }
-
-  //tabel absensi
-  final RxList<AttendanceModel> attendanceList = <AttendanceModel>[].obs;
+  // attendance list
+  final RxList<AttendanceModel> fullAttendanceList = <AttendanceModel>[].obs;
+  final RxList<AttendanceModel> filteredAttendanceList = <AttendanceModel>[].obs;
 
   final RxBool isAttendanceLoading = false.obs;
   final RxBool isAttendanceError = false.obs;
@@ -107,14 +72,60 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
 
       final result = await getAttendanceHistoryUsecase(search: search);
 
-      attendanceList.assignAll(result);
+      // update full list jika search kosong
+      if (search == null || search.isEmpty) {
+        fullAttendanceList.assignAll(result);
+        // sync state card hanya dari full list
+        syncTodayAttendanceFromHistory();
+      }
 
-      syncTodayAttendanceFromHistory();
+      // update filtered list sesuai search
+      if (search != null && search.isNotEmpty) {
+        filteredAttendanceList.assignAll(
+          result
+              .where((e) => e.date
+                  .toLowerCase()
+                  .contains(search.toLowerCase()))
+              .toList(),
+        );
+      } else {
+        filteredAttendanceList.assignAll(result);
+      }
     } catch (_) {
-      attendanceList.clear();
-      isAttendanceError.value = false;
+      filteredAttendanceList.clear();
+      isAttendanceError.value = true;
     } finally {
       isAttendanceLoading.value = false;
+    }
+  }
+
+  void syncTodayAttendanceFromHistory() {
+    final now = DateTime.now();
+
+    try {
+      final todayData = fullAttendanceList.firstWhere((e) {
+        try {
+          final apiDate = DateTime.parse(e.rawDate);
+          return apiDate.year == now.year &&
+              apiDate.month == now.month &&
+              apiDate.day == now.day;
+        } catch (_) {
+          return false;
+        }
+      });
+
+      todayClockIn.value =
+          todayData.clockIn.trim().isEmpty ? "-" : todayData.clockIn;
+      todayClockOut.value =
+          todayData.clockOut.trim().isEmpty ? "-" : todayData.clockOut;
+
+      isClockInDone.value = todayClockIn.value != "-";
+      isClockOutDone.value = todayClockOut.value != "-";
+    } catch (_) {
+      todayClockIn.value = "-";
+      todayClockOut.value = "-";
+      isClockInDone.value = false;
+      isClockOutDone.value = false;
     }
   }
 
@@ -122,7 +133,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     if (isAttendanceLoading.value) return "";
     if (isAttendanceError.value) return "Gagal memuat data";
 
-    if (attendanceList.isEmpty) {
+    if (filteredAttendanceList.isEmpty) {
       return isSearchingAttendance.value
           ? "Data tidak ditemukan"
           : "Belum ada data absensi";
@@ -131,13 +142,11 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     return "";
   }
 
-  //tabel cuti
+  // leave list
   final RxList<LeaveHistoryModel> leaveList = <LeaveHistoryModel>[].obs;
-
   final RxBool isLeaveLoading = false.obs;
   final RxBool isLeaveError = false.obs;
   final RxBool isSearchingLeave = false.obs;
-
   Timer? _leaveDebounce;
 
   void onLeaveSearchChanged(String value) {
@@ -156,7 +165,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       isLeaveError.value = false;
 
       final result = await getLeaveHistoryUsecase(search: search);
-
       leaveList.assignAll(result);
     } catch (_) {
       leaveList.clear();
@@ -189,7 +197,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       if (end.isBefore(start)) return "-";
 
       final totalDays = end.difference(start).inDays + 1;
-
       return "$totalDays Hari";
     } catch (_) {
       return "-";
@@ -263,7 +270,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         showButton: false,
       );
 
-      await fetchAttendance(); 
+      await fetchAttendance(); // refresh full list & filtered
     } catch (e) {
       LoadingDialog.close();
       final error = e.toString().replaceAll('Exception: ', '');
@@ -284,7 +291,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         showButton: false,
       );
 
-      await fetchAttendance();
+      await fetchAttendance(); // refresh full list & filtered
     } catch (e) {
       LoadingDialog.close();
       final error = e.toString().replaceAll('Exception: ', '');

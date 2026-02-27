@@ -66,66 +66,66 @@ class DashboardScreen extends GetView<DashboardController> {
                 },
               )
             : !controller.isClockOutDone.value
-            ? CardDashboard(
-                title: "Anda sudah absen hari ini",
-                subtitle: "Absensi anda",
-                headerColor: AppColor.primary,
-                items: [
-                  CardInfoItem(
-                    title: "Jam masuk",
-                    value: controller.todayClockIn.value,
-                  ),
-                  CardInfoItem(title: "Jam pulang", value: "-"),
-                ],
-                buttonLabel: "Clock out",
-                buttonColor: AppColor.danger,
-                icon: const HeroIcon(HeroIcons.clock),
-                onPressed: () {
-                  final now = TimeOfDay.now();
-                  if (now.hour < 17) {
-                    Alertdialog.show(
-                      animasi: AppAssets.lottieQuestion,
-                      message:
-                          "Belum masuk jam pulang, ingin lanjut Clock Out?",
-                      isQuestion: true,
-                      onConfirm: () {
-                        Get.back();
-                        ModalDialog.show(
-                          maxLength: 50,
-                          onSubmit: (text) {
+                ? CardDashboard(
+                    title: "Anda sudah absen hari ini",
+                    subtitle: "Absensi anda",
+                    headerColor: AppColor.primary,
+                    items: [
+                      CardInfoItem(
+                        title: "Jam masuk",
+                        value: controller.todayClockIn.value,
+                      ),
+                      CardInfoItem(title: "Jam pulang", value: "-"),
+                    ],
+                    buttonLabel: "Clock out",
+                    buttonColor: AppColor.danger,
+                    icon: const HeroIcon(HeroIcons.clock),
+                    onPressed: () {
+                      final now = TimeOfDay.now();
+                      if (now.hour < 17) {
+                        Alertdialog.show(
+                          animasi: AppAssets.lottieQuestion,
+                          message:
+                              "Belum masuk jam pulang, ingin lanjut Clock Out?",
+                          isQuestion: true,
+                          onConfirm: () {
                             Get.back();
-                            controller.clockOut(note: text);
+                            ModalDialog.show(
+                              maxLength: 50,
+                              onSubmit: (text) {
+                                Get.back();
+                                controller.clockOut(note: text);
+                              },
+                            );
                           },
                         );
-                      },
-                    );
-                  } else {
-                    Alertdialog.show(
-                      animasi: AppAssets.lottieQuestion,
-                      isQuestion: true,
-                      message: "Yakin ingin clock out?",
-                      onConfirm: () {
-                        Get.back();
-                        controller.clockOut();
-                      },
-                    );
-                  }
-                },
-              )
-            : CardDashboard(
-                title: "Absensi anda sudah lengkap!",
-                headerColor: AppColor.succes,
-                items: [
-                  CardInfoItem(
-                    title: "Jam masuk",
-                    value: controller.todayClockIn.value,
+                      } else {
+                        Alertdialog.show(
+                          animasi: AppAssets.lottieQuestion,
+                          isQuestion: true,
+                          message: "Yakin ingin clock out?",
+                          onConfirm: () {
+                            Get.back();
+                            controller.clockOut();
+                          },
+                        );
+                      }
+                    },
+                  )
+                : CardDashboard(
+                    title: "Absensi anda sudah lengkap!",
+                    headerColor: AppColor.succes,
+                    items: [
+                      CardInfoItem(
+                        title: "Jam masuk",
+                        value: controller.todayClockIn.value,
+                      ),
+                      CardInfoItem(
+                        title: "Jam pulang",
+                        value: controller.todayClockOut.value,
+                      ),
+                    ],
                   ),
-                  CardInfoItem(
-                    title: "Jam pulang",
-                    value: controller.todayClockOut.value,
-                  ),
-                ],
-              ),
       ),
       Obx(
         () => CardDashboard(
@@ -183,7 +183,10 @@ class DashboardScreen extends GetView<DashboardController> {
                     bottom: 15,
                   ),
                   child: TabBarView(
-                    children: [_buildAttendance(context), _buildLeave(context)],
+                    children: [
+                      _buildAttendance(context),
+                      _buildLeave(context),
+                    ],
                   ),
                 ),
               ),
@@ -216,7 +219,10 @@ class DashboardScreen extends GetView<DashboardController> {
                     DataColumn(label: Text("Clock Out")),
                     DataColumn(label: Text("Alasan")),
                   ],
-                  rows: controller.attendanceList.asMap().entries.map((entry) {
+                  rows: controller.filteredAttendanceList
+                      .asMap()
+                      .entries
+                      .map((entry) {
                     final index = entry.key;
                     final item = entry.value;
 
@@ -245,13 +251,7 @@ class DashboardScreen extends GetView<DashboardController> {
                             ),
                           ),
                         ),
-                        DataCell(
-                          Center(
-                            child: Text(
-                              item.note,
-                            ),
-                          ),
-                        ),
+                        DataCell(Center(child: Text(item.note))),
                       ],
                     );
                   }).toList(),
