@@ -9,6 +9,7 @@ class ProfileModel {
   final String employmentDuration;
   final int totalLeavesTaken;
   final String phone;
+  final String nik;
   final String status;
   final String role;
 
@@ -23,6 +24,7 @@ class ProfileModel {
     required this.employmentDuration,
     required this.totalLeavesTaken,
     required this.phone,
+    required this.nik,
     required this.status,
     required this.role,
   });
@@ -39,6 +41,7 @@ class ProfileModel {
       employmentDuration: json['employment_duration'] ?? "",
       totalLeavesTaken: json['total_leaves_taken'] ?? 0,
       phone: json['phone'] ?? "",
+      nik: json['nik'] ?? "",
       status: json['status'] ?? "",
       role: json['role'] ?? "",
     );

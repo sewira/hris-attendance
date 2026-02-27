@@ -122,7 +122,11 @@ class ProfileScreen extends GetView<ProfileController> {
                             Get.toNamed(AppRoutes.password);
                           },
                         ),
-                        const ProfileItem(label: "NIP", value: "1234567"),
+                        Obx(() {
+                          final profile = controller.profile.value;
+                          if (profile == null) return const SizedBox();
+                          return ProfileItem(label: "NIP", value: profile.nik);
+                        }),
                         const SizedBox(height: 40),
                         ButtonLarge(
                           label: "Logout",

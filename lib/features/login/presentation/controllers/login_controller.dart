@@ -123,7 +123,20 @@ class LoginController extends GetxController {
 
       final error = e.toString().replaceAll("Exception: ", "");
 
-      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
-    }
+ if (error.toLowerCase().contains("blocked") ||
+        error.toLowerCase().contains("account")) {
+      Alertdialog.show(
+        animasi: AppAssets.lottieFailed,
+        message: "Akun anda terblokir, silahkan hubungi admin",
+      );
+    } else if (error.toLowerCase().contains("email") ||
+        error.toLowerCase().contains("password")) {
+      formError.value = error;
+    } else {
+      Alertdialog.show(
+        animasi: AppAssets.lottieFailed,
+        message: error,
+      );
+    }    }
   }
 }

@@ -48,7 +48,7 @@ class AlertDialogCustom extends StatelessWidget {
         children: [
           SizedBox(height: 10,),
           Lottie.asset(lottie, width: 97, height: 97),
-          SizedBox(height: 15),
+          SizedBox(height: 10),
           Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -67,7 +67,7 @@ class AlertDialogCustom extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 17),
+          SizedBox(height: 13),
           if (showButton)
             isQuestion
                 ? Row(

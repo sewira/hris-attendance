@@ -260,6 +260,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       Alertdialog.show(
         animasi: AppAssets.lottieSuccess,
         message: 'Clock in berhasil',
+        showButton: false,
       );
 
       await fetchAttendance(); 

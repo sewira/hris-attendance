@@ -214,6 +214,7 @@ class DashboardScreen extends GetView<DashboardController> {
                     DataColumn(label: Text("Durasi Kerja")),
                     DataColumn(label: Text("Clock In")),
                     DataColumn(label: Text("Clock Out")),
+                    DataColumn(label: Text("Alasan")),
                   ],
                   rows: controller.attendanceList.asMap().entries.map((entry) {
                     final index = entry.key;
@@ -241,6 +242,13 @@ class DashboardScreen extends GetView<DashboardController> {
                               style: TextStyle(
                                 color: item.clockOut.getClockOutColor(),
                               ),
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Center(
+                            child: Text(
+                              item.note,
                             ),
                           ),
                         ),

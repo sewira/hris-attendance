@@ -45,9 +45,7 @@ class CutiController extends GetxController {
     fetchLeaveHistory();
 
     reasonController.addListener(() {
-      if (reasonController.text.isEmpty) {
-        reasonError.value = "Input harus diisi";
-      } else if (reasonController.text.length > 50) {
+      if (reasonController.text.length > 50) {
         reasonError.value = "Alasan cuti maksimal 50 karakter";
       } else {
         reasonError.value = "";
