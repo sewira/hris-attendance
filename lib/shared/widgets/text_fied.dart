@@ -12,6 +12,7 @@ class TextFieldCuti extends StatelessWidget {
   final TextFieldType type;
   final VoidCallback? onTap;
   final Widget? suffixIcon;
+  final bool obscureText;
 
   const TextFieldCuti({
     super.key,
@@ -22,6 +23,7 @@ class TextFieldCuti extends StatelessWidget {
     this.type = TextFieldType.normal,
     this.onTap,
     this.suffixIcon,
+    this.obscureText = false,
   });
 
   @override
@@ -68,6 +70,7 @@ class TextFieldCuti extends StatelessWidget {
           height: 44,
           child: TextFormField(
             controller: controller,
+            obscureText: obscureText,
             readOnly: isDisabled || isDate,
             onTap: isDate ? onTap : null,
             style: const TextStyle(
@@ -87,16 +90,14 @@ class TextFieldCuti extends StatelessWidget {
                 fontFamily: "Inter",
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
-                color:
-                    isDisabled ? AppColor.netral1 : AppColor.disableBorder,
+                color: isDisabled ? AppColor.netral1 : AppColor.disableBorder,
               ),
               suffixIcon: finalSuffix,
               filled: isDisabled,
               fillColor: isDisabled ? AppColor.disable : null,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide:
-                    const BorderSide(color: AppColor.disableBorder),
+                borderSide: const BorderSide(color: AppColor.disableBorder),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),

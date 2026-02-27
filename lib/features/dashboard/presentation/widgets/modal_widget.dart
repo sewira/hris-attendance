@@ -69,9 +69,11 @@ class ModalWidget extends StatelessWidget {
                   TextField(
                     controller: controller.modalTextController,
                     maxLines: 3,
+                    style: TextStyle(color: AppColor.disableBorder),
                     onChanged: controller.onModalChanged,
                     decoration: InputDecoration(
                       hintText: "Text",
+                      hintStyle: TextStyle(color: AppColor.disableBorder),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),

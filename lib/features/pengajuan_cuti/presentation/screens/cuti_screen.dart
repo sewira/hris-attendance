@@ -10,7 +10,6 @@ class CutiScreen extends GetView<CutiController> {
 
   @override
   Widget build(BuildContext context) {
-    
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       child: Form(
@@ -46,7 +45,7 @@ class CutiScreen extends GetView<CutiController> {
                 child: Text(
                   controller.startDateError.value,
                   style: const TextStyle(
-                    color: Colors.red,
+                    color: AppColor.danger,
                     fontSize: 12,
                     fontFamily: "Inter",
                   ),
@@ -73,7 +72,7 @@ class CutiScreen extends GetView<CutiController> {
                 child: Text(
                   controller.endDateError.value,
                   style: const TextStyle(
-                    color: Colors.red,
+                    color: AppColor.danger,
                     fontSize: 12,
                     fontFamily: "Inter",
                   ),
@@ -98,7 +97,7 @@ class CutiScreen extends GetView<CutiController> {
                 child: Text(
                   controller.reasonError.value,
                   style: const TextStyle(
-                    color: Colors.red,
+                    color: AppColor.danger,
                     fontSize: 12,
                     fontFamily: "Inter",
                   ),
@@ -123,20 +122,34 @@ class CutiScreen extends GetView<CutiController> {
                 child: Text(
                   controller.leaveError.value,
                   style: const TextStyle(
-                    color: Colors.red,
+                    color: AppColor.danger,
                     fontSize: 12,
                     fontFamily: "Inter",
                   ),
                 ),
               );
             }),
+            const SizedBox(height: 16),
+            Obx(() {
+              return TextFieldCuti(
+                label: "Durasi",
+                hint: controller.durationDays.value == 0
+                    ? "0 Hari"
+                    : "${controller.durationDays.value} Hari",
+                type: TextFieldType.disabled,
+              );
+            }),
             const SizedBox(height: 24),
 
-            ButtonLarge(
-              label: "Kirim",
-              onPressed: controller.submitCuti,
-              isEnabled: true,
-              colorButton: AppColor.info,
+            Obx(
+              () => ButtonLarge(
+                label: "Kirim",
+                onPressed: controller.submitCuti,
+                isEnabled: true,
+                colorButton: controller.isFormReady.value
+                    ? AppColor.info
+                    : AppColor.disable,
+              ),
             ),
           ],
         ),

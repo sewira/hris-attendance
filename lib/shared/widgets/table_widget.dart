@@ -80,9 +80,10 @@ class CustomDataTable extends StatelessWidget {
                                 headingRowHeight: 0,
                                 dataRowMinHeight: 56,
                                 dataRowMaxHeight: double.infinity,
-                                dataRowColor: MaterialStateProperty.all(
-                                  AppColor.netral1,
+                                dataTextStyle: TextStyle(
+                                  color: AppColor.netral2,
                                 ),
+
                                 columns: _styledColumns(),
                                 rows: rows,
                               ),

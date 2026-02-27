@@ -37,10 +37,8 @@ class ProfileScreen extends GetView<ProfileController> {
                       if (controller.isLoading.value) {
                         return const CircularProgressIndicator();
                       }
-
                       final profile = controller.profile.value;
                       if (profile == null) return const SizedBox();
-
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +48,8 @@ class ProfileScreen extends GetView<ProfileController> {
                             style: const TextStyle(
                               fontFamily: "Inter",
                               fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                              color: AppColor.disableBorder,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -59,7 +58,8 @@ class ProfileScreen extends GetView<ProfileController> {
                             style: const TextStyle(
                               fontFamily: "Inter",
                               fontSize: 17,
-                              fontWeight: FontWeight.w300,
+                              color: AppColor.disableBorder,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -100,134 +100,154 @@ class ProfileScreen extends GetView<ProfileController> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ListView(
-                    children: [
-                      Obx(() {
-                        final profile = controller.profile.value;
-                        if (profile == null) return const SizedBox();
-                        return ProfileItem(
-                          label: "Email",
-                          value: profile.email,
-                          labelFlex: 2,
-                          valueFlex: 9,
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Column(
+                      children: [
+                        Obx(() {
+                          final profile = controller.profile.value;
+                          if (profile == null) return const SizedBox();
+                          return ProfileItem(
+                            label: "Email",
+                            value: profile.email,
+                            labelFlex: 2,
+                            valueFlex: 9,
+                          );
+                        }),
+                        ProfileItem(
+                          label: "Password",
+                          value: "********",
                           isIcon: true,
                           onTap: () {
-                            Get.toNamed(AppRoutes.email);
+                            Get.toNamed(AppRoutes.password);
                           },
-                        );
-                      }),
-                      ProfileItem(
-                        label: "Password",
-                        value: "********",
-                        isIcon: true,
-                        onTap: () {
-                          Get.toNamed(AppRoutes.password);
-                        },
-                      ),
-                      const ProfileItem(label: "NIP", value: "1234567"),
-                      const SizedBox(height: 40),
-                      ButtonLarge(
-                        label: "Logout",
-                        onPressed: () {
-                          Alertdialog.show(
-                            animasi: AppAssets.lottieQuestion,
-                            message: "Ingin keluar dari akun anda",
-                            isQuestion: true,
-                            onConfirm: () async {
-                              await AppStorage.logout();
-                              Get.offAllNamed(AppRoutes.login);
-                            },
-                          );
-                        },
-                        isEnabled: true,
-                        colorButton: AppColor.danger,
-                      ),
-                    ],
+                        ),
+                        const ProfileItem(label: "NIP", value: "1234567"),
+                        const SizedBox(height: 40),
+                        ButtonLarge(
+                          label: "Logout",
+                          onPressed: () {
+                            Alertdialog.show(
+                              animasi: AppAssets.lottieQuestion,
+                              message: "Ingin keluar dari akun anda",
+                              isQuestion: true,
+                              onConfirm: () async {
+                                await AppStorage.logout();
+                                Get.offAllNamed(AppRoutes.login);
+                              },
+                            );
+                          },
+                          isEnabled: true,
+                          colorButton: AppColor.danger,
+                        ),
+                      ],
+                    ),
                   ),
 
                   Obx(() {
                     if (controller.isLoading.value) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
                     final profile = controller.profile.value;
                     if (profile == null) return const SizedBox();
 
-                    return Column(
-                      children: [
-                        ProfileItem(
-                          label: "Lama bekerja",
-                          value: profile.employmentDuration,
-                        ),
-                        ProfileItem(label: "Divisi", value: profile.department),
-                        ProfileItem(
-                          label: "Total Cuti Diambil",
-                          value: profile.totalLeavesTaken.toString(),
-                          labelFlex: 7,
-                          valueFlex: 3,
-                        ),
-                        ProfileItem(
-                          label: "Sisa Cuti",
-                          value: profile.leaveBalance.toString(),
-                          labelFlex: 7,
-                          valueFlex: 3,
-                        ),
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ProfileItem(
+                            label: "Lama bekerja",
+                            value: profile.employmentDuration,
+                          ),
+                          ProfileItem(
+                            label: "Divisi",
+                            value: profile.department,
+                          ),
+                          ProfileItem(
+                            label: "Total Cuti Diambil",
+                            value: profile.totalLeavesTaken.toString(),
+                            labelFlex: 7,
+                            valueFlex: 3,
+                          ),
+                          ProfileItem(
+                            label: "Sisa Cuti",
+                            value: profile.leaveBalance.toString(),
+                            labelFlex: 7,
+                            valueFlex: 3,
+                          ),
 
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Riwayat absen",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.disable,
-                              ),
-                            ),
-
-                            SizedBox(
-                              width: 160,
-                              height: 35,
-                              child: TextField(
-                                onChanged: controller.onSearchChanged,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColor.netral2,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Riwayat absen",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.disableBorder,
                                 ),
-                                decoration: InputDecoration(
-                                  hintText: "Search...",
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  suffixIcon: const Icon(
-                                    Icons.search,
-                                    size: 18,
+                              ),
+                              SizedBox(
+                                width: 160,
+                                height: 35,
+                                child: TextField(
+                                  onChanged: controller.onSearchChanged,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppColor.netral2,
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6),
-                                    borderSide: BorderSide(
+                                  decoration: InputDecoration(
+                                    hintText: "Search...",
+                                    hintStyle: TextStyle(
                                       color: AppColor.disableBorder,
-                                      width: 1.5,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    suffixIcon: const Icon(
+                                      Icons.search,
+                                      size: 18,
+                                      color: AppColor.disableBorder,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: const BorderSide(
+                                        color: AppColor.disableBorder,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: const BorderSide(
+                                        color: AppColor.disableBorder,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: const BorderSide(
+                                        color: AppColor.disableBorder,
+                                        width: 1.5,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
 
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: Obx(() {
-                            return Stack(
+                          const SizedBox(height: 12),
+
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.25,
+                            width: double.infinity,
+                            child: Stack(
                               children: [
                                 CustomDataTable(
                                   columns: const [
@@ -243,7 +263,6 @@ class ProfileScreen extends GetView<ProfileController> {
                                       .map((entry) {
                                         final index = entry.key;
                                         final data = entry.value;
-
                                         return DataRow(
                                           cells: [
                                             DataCell(
@@ -287,6 +306,30 @@ class ProfileScreen extends GetView<ProfileController> {
                                       .toList(),
                                 ),
 
+                                if (!controller.isAttendanceLoading.value &&
+                                    controller
+                                        .attendanceEmptyMessage
+                                        .isNotEmpty)
+                                  Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: MediaQuery.removeViewInsets(
+                                        context: context,
+                                        removeBottom: true,
+                                        child: Align(
+                                          alignment: const Alignment(0, 0.25),
+                                          child: Text(
+                                            controller.attendanceEmptyMessage,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: AppColor.netral2,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
                                 if (controller.isAttendanceLoading.value)
                                   const Positioned.fill(
                                     child: IgnorePointer(
@@ -295,29 +338,11 @@ class ProfileScreen extends GetView<ProfileController> {
                                       ),
                                     ),
                                   ),
-
-                                if (!controller.isAttendanceLoading.value &&
-                                    controller
-                                        .attendanceEmptyMessage
-                                        .isNotEmpty)
-                                  Positioned.fill(
-                                    child: IgnorePointer(
-                                      child: Center(
-                                        child: Text(
-                                          controller.attendanceEmptyMessage,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: AppColor.netral2,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                               ],
-                            );
-                          }),
-                        ),
-                      ],
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   }),
                 ],

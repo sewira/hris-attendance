@@ -11,4 +11,5 @@ abstract class ApiEndpoints {
   static const String clockIn = 'attendance/clock-in';
   static const String checkLocation = 'attendance/check-location';
   static const String clockOut= 'attendance/clock-out';
+  static const String isNewEmployee= 'auth/new-employee';
 }

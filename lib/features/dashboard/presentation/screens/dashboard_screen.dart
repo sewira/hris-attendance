@@ -57,15 +57,14 @@ class DashboardScreen extends GetView<DashboardController> {
 
                       SelfieConfirmationDialog.show(
                         onConfirm: (photo) {
-                          Get.back(); 
-                          controller.clockIn(photo); 
+                          Get.back();
+                          controller.clockIn(photo);
                         },
                       );
                     },
                   );
                 },
               )
-
             : !controller.isClockOutDone.value
             ? CardDashboard(
                 title: "Anda sudah absen hari ini",
@@ -90,11 +89,11 @@ class DashboardScreen extends GetView<DashboardController> {
                           "Belum masuk jam pulang, ingin lanjut Clock Out?",
                       isQuestion: true,
                       onConfirm: () {
-                        Get.back(); 
+                        Get.back();
                         ModalDialog.show(
                           maxLength: 50,
                           onSubmit: (text) {
-                            Get.back(); 
+                            Get.back();
                             controller.clockOut(note: text);
                           },
                         );
@@ -113,7 +112,6 @@ class DashboardScreen extends GetView<DashboardController> {
                   }
                 },
               )
-
             : CardDashboard(
                 title: "Absensi anda sudah lengkap!",
                 headerColor: AppColor.succes,
@@ -129,17 +127,24 @@ class DashboardScreen extends GetView<DashboardController> {
                 ],
               ),
       ),
-
-      CardDashboard(
-        title: "Info cuti anda",
-        headerColor: AppColor.info,
-        items: [
-          CardInfoItem(title: "Total pengajuan", value: "9"),
-          CardInfoItem(title: "Cuti tersisa", value: "4"),
-        ],
-        buttonLabel: "Ambil Cuti",
-        buttonColor: AppColor.primary,
-        onPressed: onGoToCuti,
+      Obx(
+        () => CardDashboard(
+          title: "Info cuti anda",
+          headerColor: AppColor.info,
+          items: [
+            CardInfoItem(
+              title: "Total pengajuan",
+              value: controller.totalLeaveTaken.toString(),
+            ),
+            CardInfoItem(
+              title: "Cuti tersisa",
+              value: controller.leaveBalance.toString(),
+            ),
+          ],
+          buttonLabel: "Ambil Cuti",
+          buttonColor: AppColor.primary,
+          onPressed: onGoToCuti,
+        ),
       ),
     ];
 
@@ -152,15 +157,12 @@ class DashboardScreen extends GetView<DashboardController> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-
               CarouselWidget(
                 controller: controller.pageController,
                 items: cards,
                 onPageChanged: controller.onPageChanged,
               ),
-
               const SizedBox(height: 10),
-
               TabBar(
                 indicatorColor: AppColor.disableBorder,
                 labelColor: AppColor.disableBorder,
@@ -172,9 +174,7 @@ class DashboardScreen extends GetView<DashboardController> {
                   Tab(text: "Riwayat cuti"),
                 ],
               ),
-
               const SizedBox(height: 15),
-
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -194,15 +194,17 @@ class DashboardScreen extends GetView<DashboardController> {
     );
   }
 
-  //absensi
   Widget _buildAttendance(BuildContext context) {
     return Column(
       children: [
         _buildSearchField(controller.onAttendanceSearchChanged),
         const SizedBox(height: 12),
-
         Expanded(
           child: Obx(() {
+            final isEmpty =
+                !controller.isAttendanceLoading.value &&
+                controller.attendanceEmptyMessage.isNotEmpty;
+
             return Stack(
               children: [
                 CustomDataTable(
@@ -246,24 +248,25 @@ class DashboardScreen extends GetView<DashboardController> {
                     );
                   }).toList(),
                 ),
-
                 if (controller.isAttendanceLoading.value)
                   const Positioned.fill(
                     child: IgnorePointer(
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   ),
-
-                if (!controller.isAttendanceLoading.value &&
-                    controller.attendanceEmptyMessage.isNotEmpty)
+                if (isEmpty)
                   Positioned.fill(
                     child: IgnorePointer(
-                      child: Center(
-                        child: Text(
-                          controller.attendanceEmptyMessage,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColor.netral2,
+                      child: MediaQuery.removeViewInsets(
+                        context: context,
+                        removeBottom: true,
+                        child: Center(
+                          child: Text(
+                            controller.attendanceEmptyMessage,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColor.netral2,
+                            ),
                           ),
                         ),
                       ),
@@ -277,22 +280,25 @@ class DashboardScreen extends GetView<DashboardController> {
     );
   }
 
-  //cuti
   Widget _buildLeave(BuildContext context) {
     return Column(
       children: [
         _buildSearchField(controller.onLeaveSearchChanged),
         const SizedBox(height: 12),
-
         Expanded(
           child: Obx(() {
+            final isEmpty =
+                !controller.isLeaveLoading.value &&
+                controller.leaveEmptyMessage.isNotEmpty;
+
             return Stack(
               children: [
                 CustomDataTable(
-                  columnWidths: [60, 140, 180, 180, 140, 120],
+                  columnWidths: [60, 130, 80, 180, 180, 110, 130],
                   columns: const [
                     DataColumn(label: Text("No")),
                     DataColumn(label: Text("Tanggal Cuti")),
+                    DataColumn(label: Text("Durasi")),
                     DataColumn(label: Text("Alasan Cuti")),
                     DataColumn(label: Text("Catatan HR")),
                     DataColumn(label: Text("Last User")),
@@ -314,6 +320,16 @@ class DashboardScreen extends GetView<DashboardController> {
                           ),
                         ),
                         DataCell(
+                          Center(
+                            child: Text(
+                              controller.calculateLeaveDuration(
+                                item.startDate,
+                                item.endDate,
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataCell(
                           SizedBox(
                             width: 180,
                             child: Text(
@@ -325,7 +341,18 @@ class DashboardScreen extends GetView<DashboardController> {
                             ),
                           ),
                         ),
-                        DataCell(Center(child: Text(item.hrNote))),
+                        DataCell(
+                          SizedBox(
+                            width: 180,
+                            child: Text(
+                              item.hrNote,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              maxLines: null,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                        ),
                         DataCell(Center(child: Text(item.approvedBy))),
                         DataCell(
                           Center(child: StatusWidget(status: item.status)),
@@ -334,24 +361,25 @@ class DashboardScreen extends GetView<DashboardController> {
                     );
                   }).toList(),
                 ),
-
                 if (controller.isLeaveLoading.value)
                   const Positioned.fill(
                     child: IgnorePointer(
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   ),
-
-                if (!controller.isLeaveLoading.value &&
-                    controller.leaveEmptyMessage.isNotEmpty)
+                if (isEmpty)
                   Positioned.fill(
                     child: IgnorePointer(
-                      child: Center(
-                        child: Text(
-                          controller.leaveEmptyMessage,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColor.netral2,
+                      child: MediaQuery.removeViewInsets(
+                        context: context,
+                        removeBottom: true,
+                        child: Center(
+                          child: Text(
+                            controller.leaveEmptyMessage,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColor.netral2,
+                            ),
                           ),
                         ),
                       ),
@@ -373,20 +401,41 @@ class DashboardScreen extends GetView<DashboardController> {
         height: 38,
         child: TextField(
           onChanged: onChanged,
-          style: const TextStyle(fontSize: 14, color: AppColor.netral2),
+          style: const TextStyle(fontSize: 14, color: AppColor.disableBorder),
           decoration: InputDecoration(
             hintText: "Search...",
+            hintStyle: const TextStyle(color: AppColor.disablePressed),
             filled: true,
             fillColor: Colors.white,
-            suffixIcon: const Icon(Icons.search, size: 18),
+            suffixIcon: const Icon(
+              Icons.search,
+              size: 18,
+              color: AppColor.disablePressed,
+            ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 6,
             ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: const BorderSide(
+                color: AppColor.disableBorder,
+                width: 1,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: const BorderSide(
+                color: AppColor.disableBorder,
+                width: 1,
+              ),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: AppColor.disableBorder, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColor.disableBorder,
+                width: 1.5,
+              ),
             ),
           ),
         ),

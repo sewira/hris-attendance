@@ -3,20 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/config/theme/app_assets.dart';
-import 'package:hr_attendance/core/utils/app_storage.dart';
 import 'package:hr_attendance/features/attendance_history_shared/data/models/attendance_history_model.dart';
 import 'package:hr_attendance/features/attendance_history_shared/domain/usecases/get_attendance_history_month.dart';
-import 'package:hr_attendance/features/dashboard/data/models/attendance_today_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/check_location_model.dart';
 import 'package:hr_attendance/features/dashboard/data/models/leave_history_model.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/check_location_usecase.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/clock_in_usecase.dart';
 import 'package:hr_attendance/features/dashboard/domain/usecases/clock_out_usecase.dart';
+import 'package:hr_attendance/features/dashboard/domain/usecases/get_leave_history.dart';
+import 'package:hr_attendance/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:hr_attendance/shared/widgets/alert_dialog.dart';
 import 'package:hr_attendance/shared/widgets/loading_dialog.dart';
-import '../../domain/usecases/get_leave_history.dart';
 
-class DashboardController extends GetxController {
+class DashboardController extends GetxController with WidgetsBindingObserver {
   final GetAttendanceHistoryMonthUsecase getAttendanceHistoryUsecase;
   final GetLeaveHistoryUsecase getLeaveHistoryUsecase;
   final ClockInUsecase clockInUsecase;
@@ -31,24 +30,69 @@ class DashboardController extends GetxController {
     this.clockOutUsecase,
   );
 
-  // Carousel
+  ProfileController get profileController => Get.find();
+  int get leaveBalance => profileController.leaveBalance;
+  int get totalLeaveTaken => profileController.totalLeavesTaken;
+
+  //carrosel
   late PageController pageController;
   final RxInt currentPage = 0.obs;
 
   void onPageChanged(int index) {
     currentPage.value = index;
-    AppStorage.saveCardIndex(index);
   }
 
-  // Absensi
+  //state card
+  final RxString todayClockIn = "-".obs;
+  final RxString todayClockOut = "-".obs;
+  final RxBool isClockInDone = false.obs;
+  final RxBool isClockOutDone = false.obs;
+
+  void syncTodayAttendanceFromHistory() {
+    final now = DateTime.now();
+
+    try {
+      final todayData = attendanceList.firstWhere((e) {
+        try {
+          final apiDate = DateTime.parse(e.rawDate);
+          return apiDate.year == now.year &&
+              apiDate.month == now.month &&
+              apiDate.day == now.day;
+        } catch (_) {
+          return false;
+        }
+      });
+
+      todayClockIn.value = todayData.clockIn.trim().isEmpty
+          ? "-"
+          : todayData.clockIn;
+
+      todayClockOut.value = todayData.clockOut.trim().isEmpty
+          ? "-"
+          : todayData.clockOut;
+
+      isClockInDone.value = todayClockIn.value != "-";
+      isClockOutDone.value = todayClockOut.value != "-";
+    } catch (_) {
+      todayClockIn.value = "-";
+      todayClockOut.value = "-";
+      isClockInDone.value = false;
+      isClockOutDone.value = false;
+    }
+  }
+
+  //tabel absensi
   final RxList<AttendanceModel> attendanceList = <AttendanceModel>[].obs;
+
   final RxBool isAttendanceLoading = false.obs;
   final RxBool isAttendanceError = false.obs;
   final RxBool isSearchingAttendance = false.obs;
+
   Timer? _attendanceDebounce;
 
   void onAttendanceSearchChanged(String value) {
     isSearchingAttendance.value = value.trim().isNotEmpty;
+
     _attendanceDebounce?.cancel();
     _attendanceDebounce = Timer(
       const Duration(milliseconds: 500),
@@ -60,11 +104,15 @@ class DashboardController extends GetxController {
     try {
       isAttendanceLoading.value = true;
       isAttendanceError.value = false;
+
       final result = await getAttendanceHistoryUsecase(search: search);
+
       attendanceList.assignAll(result);
+
+      syncTodayAttendanceFromHistory();
     } catch (_) {
       attendanceList.clear();
-      isAttendanceError.value = true;
+      isAttendanceError.value = false;
     } finally {
       isAttendanceLoading.value = false;
     }
@@ -73,23 +121,28 @@ class DashboardController extends GetxController {
   String get attendanceEmptyMessage {
     if (isAttendanceLoading.value) return "";
     if (isAttendanceError.value) return "Gagal memuat data";
+
     if (attendanceList.isEmpty) {
       return isSearchingAttendance.value
           ? "Data tidak ditemukan"
           : "Belum ada data absensi";
     }
+
     return "";
   }
 
-  // Cuti
+  //tabel cuti
   final RxList<LeaveHistoryModel> leaveList = <LeaveHistoryModel>[].obs;
+
   final RxBool isLeaveLoading = false.obs;
   final RxBool isLeaveError = false.obs;
   final RxBool isSearchingLeave = false.obs;
+
   Timer? _leaveDebounce;
 
   void onLeaveSearchChanged(String value) {
     isSearchingLeave.value = value.trim().isNotEmpty;
+
     _leaveDebounce?.cancel();
     _leaveDebounce = Timer(
       const Duration(milliseconds: 500),
@@ -101,7 +154,9 @@ class DashboardController extends GetxController {
     try {
       isLeaveLoading.value = true;
       isLeaveError.value = false;
+
       final result = await getLeaveHistoryUsecase(search: search);
+
       leaveList.assignAll(result);
     } catch (_) {
       leaveList.clear();
@@ -114,15 +169,52 @@ class DashboardController extends GetxController {
   String get leaveEmptyMessage {
     if (isLeaveLoading.value) return "";
     if (isLeaveError.value) return "Gagal memuat data";
+
     if (leaveList.isEmpty) {
       return isSearchingLeave.value
           ? "Data tidak ditemukan"
           : "Belum ada data cuti";
     }
+
     return "";
   }
 
-  // Modal
+  String calculateLeaveDuration(String startDate, String endDate) {
+    try {
+      if (startDate == "-" || endDate == "-") return "-";
+
+      final start = DateTime.parse(startDate);
+      final end = DateTime.parse(endDate);
+
+      if (end.isBefore(start)) return "-";
+
+      final totalDays = end.difference(start).inDays + 1;
+
+      return "$totalDays Hari";
+    } catch (_) {
+      return "-";
+    }
+  }
+
+  //cek lokasi
+  Future<CheckLocationResponse?> checkLocation({
+    required double lat,
+    required double lng,
+  }) async {
+    try {
+      LoadingDialog.show();
+      final result = await checkLocationUsecase(lat: lat, lng: lng);
+      LoadingDialog.close();
+      return result;
+    } catch (e) {
+      LoadingDialog.close();
+      final error = e.toString().replaceAll('Exception: ', '');
+      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
+      return null;
+    }
+  }
+
+  //modal
   final TextEditingController modalTextController = TextEditingController();
   final RxBool isModalValid = false.obs;
   final RxBool isOverLimit = false.obs;
@@ -158,52 +250,19 @@ class DashboardController extends GetxController {
     modalMessage.value = "";
   }
 
-  // Check Location
-  Future<CheckLocationResponse?> checkLocation({
-    required double lat,
-    required double lng,
-  }) async {
-    try {
-      LoadingDialog.show();
-      final result = await checkLocationUsecase(lat: lat, lng: lng);
-      LoadingDialog.close();
-      return result;
-    } catch (e) {
-      LoadingDialog.close();
-      final error = e.toString().replaceAll('Exception: ', '');
-      Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
-      return null;
-    }
-  }
-
-  // Clock In / Clock Out
-  final RxString todayClockIn = "-".obs;
-  final RxString todayClockOut = "-".obs;
-  final RxBool isClockInDone = false.obs;
-  final RxBool isClockOutDone = false.obs;
-  final Rx<AttendanceTodayModel?> todayAttendance = Rx<AttendanceTodayModel?>(null);
-  Timer? _midnightTimer;
-
-  String formatTime(String? isoString) {
-    if (isoString == null) return "-";
-    final dt = DateTime.parse(isoString).toLocal();
-    return "${dt.hour.toString().padLeft(2,'0')}:${dt.minute.toString().padLeft(2,'0')}";
-  }
-
+  //clock in
   Future<void> clockIn(File photo) async {
     try {
       LoadingDialog.show();
-      final result = await clockInUsecase(photo);
+      await clockInUsecase(photo);
       LoadingDialog.close();
 
-      todayAttendance.value = result;
-      todayClockIn.value = formatTime(result.clockIn);
-      isClockInDone.value = true;
+      Alertdialog.show(
+        animasi: AppAssets.lottieSuccess,
+        message: 'Clock in berhasil',
+      );
 
-      await AppStorage.saveClockIn(result.clockIn);
-
-      Alertdialog.show(animasi: AppAssets.lottieSuccess, message: 'Clock in berhasil');
-      fetchAttendance();
+      await fetchAttendance(); 
     } catch (e) {
       LoadingDialog.close();
       final error = e.toString().replaceAll('Exception: ', '');
@@ -211,20 +270,20 @@ class DashboardController extends GetxController {
     }
   }
 
+  //clock out
   Future<void> clockOut({String? note}) async {
     try {
       LoadingDialog.show();
       await clockOutUsecase(note: note);
       LoadingDialog.close();
 
-      final now = DateTime.now();
-      todayClockOut.value = "${now.hour.toString().padLeft(2,'0')}:${now.minute.toString().padLeft(2,'0')}";
-      isClockOutDone.value = true;
+      Alertdialog.show(
+        animasi: AppAssets.lottieSuccess,
+        message: 'Clock out berhasil',
+        showButton: false,
+      );
 
-      await AppStorage.saveClockOut(now.toIso8601String());
-
-      Alertdialog.show(animasi: AppAssets.lottieSuccess, message: 'Clock out berhasil', showButton: false);
-      fetchAttendance();
+      await fetchAttendance();
     } catch (e) {
       LoadingDialog.close();
       final error = e.toString().replaceAll('Exception: ', '');
@@ -236,48 +295,26 @@ class DashboardController extends GetxController {
   void onInit() {
     super.onInit();
 
-    final savedIndex = AppStorage.getCardIndex();
-    pageController = PageController(viewportFraction: 0.94, initialPage: savedIndex);
-    currentPage.value = savedIndex;
+    WidgetsBinding.instance.addObserver(this);
+    pageController = PageController(viewportFraction: 0.94);
 
     fetchAttendance();
     fetchLeave();
-
-    todayClockIn.value = formatTime(AppStorage.getClockIn());
-    todayClockOut.value = formatTime(AppStorage.getClockOut());
-    isClockInDone.value = AppStorage.getIsClockInDone();
-    isClockOutDone.value = AppStorage.getIsClockOutDone();
-
-    _setupMidnightReset();
   }
 
-  void _setupMidnightReset() {
-    final now = DateTime.now();
-    final nextMidnight = DateTime(now.year, now.month, now.day + 1);
-    final duration = nextMidnight.difference(now);
-
-    _midnightTimer?.cancel();
-    _midnightTimer = Timer(duration, () {
-      todayAttendance.value = null;
-      todayClockIn.value = "-";
-      todayClockOut.value = "-";
-      isClockInDone.value = false;
-      isClockOutDone.value = false;
-      currentPage.value = 0;
-
-      AppStorage.resetCardIndex();
-      AppStorage.resetClockState();
-
-      _setupMidnightReset();
-    });
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      fetchAttendance();
+    }
   }
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     pageController.dispose();
     _attendanceDebounce?.cancel();
     _leaveDebounce?.cancel();
-    _midnightTimer?.cancel();
     super.onClose();
   }
 }

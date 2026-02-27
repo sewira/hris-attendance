@@ -96,4 +96,7 @@ class ProfileController extends GetxController {
 
 int get leaveBalance =>
     profile.value?.leaveBalance ?? 0;
+
+int get totalLeavesTaken =>
+    profile.value?.totalLeavesTaken ?? 0;
 }

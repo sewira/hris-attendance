@@ -27,10 +27,7 @@ extension DateRangeExtension on DateTime {
           "${date.day.toString().padLeft(2, '0')}";
     }
 
-    return {
-      "start_date": format(firstDay),
-      "end_date": format(lastDay),
-    };
+    return {"start_date": format(firstDay), "end_date": format(lastDay)};
   }
 }
 
@@ -77,8 +74,7 @@ extension StringExtension on String {
     }
   }
 
-   String toFormattedLeaveRange(String endDate,
-      {String locale = "id_ID"}) {
+  String toFormattedLeaveRange(String endDate, {String locale = "id_ID"}) {
     if (isEmpty || this == "-" || endDate.isEmpty || endDate == "-") {
       return "-";
     }
@@ -119,7 +115,7 @@ extension StringExtension on String {
       final hour = int.parse(parts[0]);
       final minute = int.parse(parts[1]);
 
-      if (hour > 8 || (hour == 8 && minute > 15)) {
+      if (hour > 8 || (hour == 8 && minute > 10)) {
         return AppColor.danger;
       }
 
@@ -130,7 +126,7 @@ extension StringExtension on String {
   }
 
   Color getClockOutColor() {
-     try {
+    try {
       if (this == "-" || isEmpty) return Colors.black;
 
       final parts = split(":");

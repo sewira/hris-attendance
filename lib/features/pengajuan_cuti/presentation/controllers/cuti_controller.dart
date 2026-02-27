@@ -22,11 +22,14 @@ class CutiController extends GetxController {
   final endDateController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
+
   final RxString startDateError = "".obs;
   final RxString endDateError = "".obs;
   final RxString reasonError = "".obs;
   final RxString leaveError = "".obs;
-  final RxBool isLoading = false.obs;
+
+  final RxInt durationDays = 0.obs;
+  final RxBool isFormReady = false.obs;
 
   final DateFormat inputFormat = DateFormat("dd/MM/yyyy");
   final DateFormat apiFormat = DateFormat("yyyy-MM-dd");
@@ -42,12 +45,27 @@ class CutiController extends GetxController {
     fetchLeaveHistory();
 
     reasonController.addListener(() {
-      if (reasonController.text.length > 50) {
+      if (reasonController.text.isEmpty) {
+        reasonError.value = "Input harus diisi";
+      } else if (reasonController.text.length > 50) {
         reasonError.value = "Alasan cuti maksimal 50 karakter";
       } else {
         reasonError.value = "";
       }
+      checkFormReady();
     });
+  }
+
+  void checkFormReady() {
+    isFormReady.value =
+        startDateController.text.isNotEmpty &&
+        endDateController.text.isNotEmpty &&
+        reasonController.text.isNotEmpty &&
+        startDateError.value.isEmpty &&
+        endDateError.value.isEmpty &&
+        reasonError.value.isEmpty &&
+        leaveError.value.isEmpty &&
+        durationDays.value > 0;
   }
 
   Future<void> fetchLeaveHistory() async {
@@ -65,16 +83,19 @@ class CutiController extends GetxController {
 
     if (picked != null) {
       startDateController.text = inputFormat.format(picked);
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      final start = picked;
 
-      if (start.isBefore(today)) {
+      final today = DateTime.now();
+      final nowOnlyDate = DateTime(today.year, today.month, today.day);
+
+      if (picked.isBefore(nowOnlyDate)) {
         startDateError.value = "Tanggal tidak boleh kurang dari hari ini";
       } else {
         startDateError.value = "";
-        validateDates();
       }
+
+      validateDates();
+      calculateDuration();
+      checkFormReady();
     }
   }
 
@@ -85,16 +106,23 @@ class CutiController extends GetxController {
       lastDate: DateTime(2100),
       initialDate: DateTime.now(),
     );
+
     if (picked != null) {
       endDateController.text = inputFormat.format(picked);
       validateDates();
+      calculateDuration();
+      checkFormReady();
     }
   }
 
   void validateDates() {
     endDateError.value = "";
-    if (startDateController.text.isEmpty || endDateController.text.isEmpty)
+
+    if (startDateController.text.isEmpty || endDateController.text.isEmpty) {
+      durationDays.value = 0;
       return;
+    }
+
     try {
       final start = inputFormat.parse(startDateController.text);
       final end = inputFormat.parse(endDateController.text);
@@ -102,15 +130,39 @@ class CutiController extends GetxController {
       if (end.isBefore(start)) {
         endDateError.value =
             "Tanggal selesai tidak boleh kurang dari tanggal mulai";
+        durationDays.value = 0;
+        return;
       }
 
-      if (startDateError.value.isEmpty && endDateError.value.isEmpty) {
-        if (isDateConflict(start, end)) {
-          startDateError.value = "Masih ada cuti berjalan";
-        }
+      if (isDateConflict(start, end)) {
+        startDateError.value = "Masih ada cuti berjalan";
+        durationDays.value = 0;
+        return;
       }
+
+      startDateError.value = "";
     } catch (_) {
       startDateError.value = "Format tanggal tidak valid";
+      durationDays.value = 0;
+    }
+  }
+
+  void calculateDuration() {
+    if (startDateController.text.isEmpty || endDateController.text.isEmpty) {
+      durationDays.value = 0;
+      return;
+    }
+
+    try {
+      final start = inputFormat.parse(startDateController.text);
+      final end = inputFormat.parse(endDateController.text);
+
+      if (!end.isBefore(start)) {
+        durationDays.value = end.difference(start).inDays + 1;
+        validateLeaveBalance();
+      }
+    } catch (_) {
+      durationDays.value = 0;
     }
   }
 
@@ -137,50 +189,33 @@ class CutiController extends GetxController {
       return;
     }
 
-    final start = inputFormat.parse(startDateController.text);
-    final end = inputFormat.parse(endDateController.text);
-
-    final totalDays = end.difference(start).inDays + 1;
-
-    if (totalDays > leaveBalance) {
+    if (durationDays.value > leaveBalance) {
       leaveError.value = "Sisa cuti tidak mencukupi";
     }
   }
 
   Future<void> submitCuti() async {
-    validateDates();
-
-    bool inputKosong = false;
-    if (startDateController.text.isEmpty) {
-      startDateError.value = "Tanggal mulai wajib diisi";
-      inputKosong = true;
-    }
-    if (endDateController.text.isEmpty) {
-      endDateError.value = "Tanggal selesai wajib diisi";
-      inputKosong = true;
-    }
-    if (reasonController.text.isEmpty) {
-      reasonError.value = "Alasan cuti wajib diisi";
-      inputKosong = true;
-    }
-
-    if (inputKosong) {
+    if (startDateController.text.isEmpty ||
+        endDateController.text.isEmpty ||
+        reasonController.text.isEmpty) {
       Alertdialog.show(
         animasi: AppAssets.lottieFailed,
-        message: "Input tidak lengkap",
+        message: "Data tidak lengkap",
       );
       return;
     }
 
+    validateDates();
+    calculateDuration();
+    validateLeaveBalance();
+
     if (startDateError.value.isNotEmpty ||
         endDateError.value.isNotEmpty ||
         reasonError.value.isNotEmpty ||
-        leaveError.value.isNotEmpty) {
+        leaveError.value.isNotEmpty ||
+        durationDays.value == 0) {
       return;
     }
-
-    validateLeaveBalance();
-    if (leaveError.value.isNotEmpty) return;
 
     try {
       LoadingDialog.show();
@@ -202,7 +237,6 @@ class CutiController extends GetxController {
       await dashboardController.fetchLeave();
 
       LoadingDialog.close();
-
       clearForm();
 
       Alertdialog.show(
@@ -211,9 +245,8 @@ class CutiController extends GetxController {
         showButton: false,
         changeMainIndex: 0,
       );
-    } catch (e) {
+    } catch (_) {
       LoadingDialog.close();
-
       Alertdialog.show(
         animasi: AppAssets.lottieFailed,
         message: "Pengajuan gagal",
@@ -225,10 +258,12 @@ class CutiController extends GetxController {
     reasonController.clear();
     startDateController.clear();
     endDateController.clear();
+    durationDays.value = 0;
     startDateError.value = "";
     endDateError.value = "";
     reasonError.value = "";
     leaveError.value = "";
+    checkFormReady();
   }
 
   @override

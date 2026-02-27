@@ -122,11 +122,6 @@ class AppStorage {
       "${date.year}-${date.month}-${date.day}";
 
   static Future<void> logout() async {
-    final userId = getUserId();
-    if (userId != null) {
-      await resetCardIndex();
-      await resetClockState();
-    }
     await _box.remove(_tokenKey);
     await _box.remove(_userIdKey);
     await _box.remove(_userNameKey);

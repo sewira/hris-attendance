@@ -27,10 +27,17 @@ class PasswordController extends GetxController {
   final isConfirmValid = false.obs;
   final isFormValid = false.obs;
 
+  final isOldObscure = true.obs;
+  final isNewObscure = true.obs;
+  final isConfirmObscure = true.obs;
+
+  void toggleOld() => isOldObscure.toggle();
+  void toggleNew() => isNewObscure.toggle();
+  void toggleConfirm() => isConfirmObscure.toggle();
+
   @override
   void onInit() {
     super.onInit();
-
     oldPasswordController.addListener(validateAll);
     newPasswordController.addListener(validateAll);
     confirmPasswordController.addListener(validateAll);
@@ -75,15 +82,19 @@ class PasswordController extends GetxController {
   }
 
   Future<void> submit() async {
-    if (oldPasswordError.value != null) {
-      return;
-    }
+    final oldPass = oldPasswordController.text.trim();
+    final newPass = newPasswordController.text.trim();
+    final confirmPass = confirmPasswordController.text.trim();
 
-    if (!isFormValid.value) {
+    if (oldPass.isEmpty || newPass.isEmpty || confirmPass.isEmpty) {
       Alertdialog.show(
         animasi: AppAssets.lottieFailed,
         message: "Data tidak lengkap",
       );
+      return; 
+    }
+
+    if (!isFormValid.value) {
       return;
     }
 
@@ -91,9 +102,9 @@ class PasswordController extends GetxController {
       LoadingDialog.show();
 
       final request = PasswordModel(
-        oldPassword: oldPasswordController.text,
-        newPassword: newPasswordController.text,
-        confirmPassword: confirmPasswordController.text,
+        oldPassword: oldPass,
+        newPassword: newPass,
+        confirmPassword: confirmPass,
       );
 
       await usecases(request);
@@ -130,5 +141,13 @@ class PasswordController extends GetxController {
         message: "Terjadi kesalahan",
       );
     }
+  }
+
+  @override
+  void onClose() {
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+    super.onClose();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:hr_attendance/config/theme/app_color.dart';
 import 'package:hr_attendance/shared/widgets/text_fied.dart';
 import 'package:hr_attendance/shared/widgets/button_widget.dart';
@@ -38,14 +39,24 @@ class PasswordScreen extends GetView<PasswordController> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
-                TextFieldCuti(
-                  label: "Password Lama",
-                  hint: "Input Password",
-                  controller: controller.oldPasswordController,
-                  type: TextFieldType.normal,
+                Obx(
+                  () => TextFieldCuti(
+                    label: "Password Lama",
+                    hint: "Input Password",
+                    controller: controller.oldPasswordController,
+                    obscureText: controller.isOldObscure.value,
+                    suffixIcon: IconButton(
+                      icon: HeroIcon(
+                        controller.isOldObscure.value
+                            ? HeroIcons.eyeSlash
+                            : HeroIcons.eye,
+                        color: AppColor.disableBorder,
+                      ),
+                      onPressed: controller.toggleOld,
+                    ),
+                  ),
                 ),
 
                 Obx(() {
@@ -62,11 +73,22 @@ class PasswordScreen extends GetView<PasswordController> {
 
                 const SizedBox(height: 16),
 
-                TextFieldCuti(
-                  label: "Password Baru",
-                  hint: "Input Password",
-                  controller: controller.newPasswordController,
-                  type: TextFieldType.normal,
+                Obx(
+                  () => TextFieldCuti(
+                    label: "Password Baru",
+                    hint: "Input Password",
+                    controller: controller.newPasswordController,
+                    obscureText: controller.isNewObscure.value,
+                    suffixIcon: IconButton(
+                      icon: HeroIcon(
+                        controller.isNewObscure.value
+                            ? HeroIcons.eyeSlash
+                            : HeroIcons.eye,
+                        color: AppColor.disableBorder,
+                      ),
+                      onPressed: controller.toggleNew,
+                    ),
+                  ),
                 ),
 
                 Obx(() {
@@ -83,17 +105,27 @@ class PasswordScreen extends GetView<PasswordController> {
 
                 const SizedBox(height: 16),
 
-                TextFieldCuti(
-                  label: "Konfirmasi Password",
-                  hint: "Input Password",
-                  controller: controller.confirmPasswordController,
-                  type: TextFieldType.normal,
+                Obx(
+                  () => TextFieldCuti(
+                    label: "Konfirmasi Password",
+                    hint: "Input Password",
+                    controller: controller.confirmPasswordController,
+                    obscureText: controller.isConfirmObscure.value,
+                    suffixIcon: IconButton(
+                      icon: HeroIcon(
+                        controller.isConfirmObscure.value
+                            ? HeroIcons.eyeSlash
+                            : HeroIcons.eye,
+                        color: AppColor.disableBorder,
+                      ),
+                      onPressed: controller.toggleConfirm,
+                    ),
+                  ),
                 ),
 
                 Obx(() {
                   final msg = controller.confirmPasswordMessage.value;
                   if (msg == null) return const SizedBox();
-
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
@@ -109,12 +141,14 @@ class PasswordScreen extends GetView<PasswordController> {
 
                 const SizedBox(height: 24),
 
-                Obx(() => ButtonLarge(
-                      label: "Kirim",
-                      onPressed: controller.submit,
-                      isEnabled: controller.isFormValid.value,
-                      colorButton: AppColor.info,
-                    )),
+                Obx(
+                  () => ButtonLarge(
+                    label: "Kirim",
+                    onPressed: controller.submit,
+                    isEnabled: controller.isFormValid.value,
+                    colorButton: AppColor.info,
+                  ),
+                ),
               ],
             ),
           ),

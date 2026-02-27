@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_attendance/core/utils/app_storage.dart';
+import 'package:hr_attendance/features/login/data/datasources/auth_remote_datasource.dart';
 import 'package:hr_attendance/shared/widgets/loading_dialog.dart';
 import '../../../../config/routes/app_routes.dart';
 import '../../../../config/theme/app_assets.dart';
@@ -9,8 +10,9 @@ import '../../domain/usecases/login_usecase.dart';
 
 class LoginController extends GetxController {
   final LoginUsecase loginUsecase;
+  final AuthRemoteDataSource authRemoteDataSource;
 
-  LoginController(this.loginUsecase);
+  LoginController(this.loginUsecase, this.authRemoteDataSource);
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -97,8 +99,14 @@ class LoginController extends GetxController {
               "Selamat datang di HRIS mini, ingin langsung ganti password?",
           cancelLabel: "Tidak",
           confirmLabel: "Iya",
-          onCancel: () {
-            user.isNewEmployee = false;
+          onCancel: () async {
+            final patched = await authRemoteDataSource.setNewEmployeeFalse();
+            if (!patched) {
+              Alertdialog.show(
+                animasi: AppAssets.lottieFailed,
+                message: "Gagal update status new employee",
+              );
+            }
             Get.offAllNamed(AppRoutes.main);
           },
           onConfirm: () {
@@ -117,12 +125,5 @@ class LoginController extends GetxController {
 
       Alertdialog.show(animasi: AppAssets.lottieFailed, message: error);
     }
-  }
-
-  @override
-  void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.onClose();
   }
 }

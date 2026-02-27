@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:hr_attendance/features/login/data/datasources/auth_remote_datasource.dart';
 import 'package:hr_attendance/features/login/domain/repositories/login_repository_impl.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/datasources/login_remote_datasource.dart';
@@ -15,16 +16,14 @@ class LoginBinding extends Bindings {
       () => LoginRemoteDataSourceImpl(Get.find()),
     );
 
-    Get.lazyPut<LoginRepository>(
-      () => LoginRepositoryImpl(Get.find()),
-    );
+    Get.lazyPut<LoginRepository>(() => LoginRepositoryImpl(Get.find()));
 
-    Get.lazyPut(
-      () => LoginUsecase(Get.find()),
-    );
-
-    Get.lazyPut(
-      () => LoginController(Get.find()),
+    Get.lazyPut(() => LoginUsecase(Get.find()));
+    Get.lazyPut<LoginController>(
+      () => LoginController(
+        Get.find(), 
+        AuthRemoteDataSourceImpl(Get.find()), 
+      ),
       fenix: true,
     );
   }
